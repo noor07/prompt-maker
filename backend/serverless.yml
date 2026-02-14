@@ -1,9 +1,14 @@
 service: prompt-maker-backend
 
+useDotenv: true
+
 provider:
   name: aws
   runtime: nodejs20.x
   region: us-east-1
+  environment:
+    GEMINI_API_KEY: ${env:GEMINI_API_KEY}
+    FIREBASE_SERVICE_ACCOUNT: ${env:FIREBASE_SERVICE_ACCOUNT}
 
 functions:
   app:
@@ -12,9 +17,11 @@ functions:
       - http:
           path: /
           method: ANY
+          cors: true
       - http:
           path: /{proxy+}
           method: ANY
+          cors: true
 
 custom:
   serverless-offline:
