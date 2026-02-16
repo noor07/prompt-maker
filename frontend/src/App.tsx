@@ -4,8 +4,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-ro
 import './App.css';
 import { PromptForm } from './components/PromptForm';
 import { PromptResult } from './components/PromptResult';
-import { Login } from './components/Login';
-import { SignUp } from './components/SignUp';
 import { Dashboard } from './components/Dashboard';
 import { PrivateRoute } from './components/PrivateRoute';
 import ModernApp from './components/ModernApp';
@@ -125,8 +123,8 @@ function App() {
           <Route path="/" element={<ModernApp />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<ModernApp initialTab="login" />} />
+          <Route path="/signup" element={<ModernApp initialTab="signup" />} />
 
           <Route
             path="/app"

@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { Login } from './Login';
+import { SignUp } from './SignUp';
 
 // --- Utility ---
 function cn(...inputs: ClassValue[]) {
@@ -32,6 +34,7 @@ function cn(...inputs: ClassValue[]) {
 const Navbar = ({ activeTab, setActiveTab, isMobileMenuOpen, setIsMobileMenuOpen }: any) => {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const isAuthView = activeTab === 'login' || activeTab === 'signup';
 
     const navItems = [
         { id: 'home', label: 'Home' },
@@ -44,12 +47,12 @@ const Navbar = ({ activeTab, setActiveTab, isMobileMenuOpen, setIsMobileMenuOpen
         if (currentUser) {
             navigate('/app');
         } else {
-            navigate('/login');
+            setActiveTab('login');
         }
     };
 
     return (
-        <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl rounded-full border border-white/10 bg-black/40 backdrop-blur-xl z-50 px-6 py-4 shadow-lg shadow-purple-500/10">
+        <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl rounded-full border border-white/10 bg-black/40 backdrop-blur-xl z-50 px-6 py-4 shadow-lg shadow-purple-500/10 transition-all duration-300">
             <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2 cursor-pointer flex-none" onClick={() => setActiveTab('home')}>
                     <div className="rounded-lg bg-indigo-500/10 p-2">
@@ -60,43 +63,60 @@ const Navbar = ({ activeTab, setActiveTab, isMobileMenuOpen, setIsMobileMenuOpen
                     </span>
                 </div>
 
-                {/* Desktop Nav */}
-                <div className="hidden md:flex items-center justify-center gap-8 flex-1">
-                    {navItems.map((item) => (
-                        <button
-                            key={item.id}
-                            onClick={() => setActiveTab(item.id)}
-                            className={cn(
-                                "text-sm font-medium transition-colors hover:text-indigo-400",
-                                activeTab === item.id ? "text-indigo-400" : "text-slate-400"
-                            )}
-                        >
-                            {item.label}
-                        </button>
-                    ))}
-                </div>
-
-                <div className="flex items-center gap-4 flex-none">
+                {isAuthView ? (
                     <button
-                        onClick={handleAction}
-                        className="rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/20 active:scale-95"
+                        onClick={() => setActiveTab('home')}
+                        className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
                     >
-                        {currentUser ? 'Go to App' : 'Get Started'}
+                        Back to Home
                     </button>
+                ) : (
+                    <>
+                        {/* Desktop Nav */}
+                        <div className="hidden md:flex items-center justify-center gap-8 flex-1">
+                            {navItems.map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => setActiveTab(item.id)}
+                                    className={cn(
+                                        "text-sm font-medium transition-colors hover:text-indigo-400",
+                                        activeTab === item.id ? "text-indigo-400" : "text-slate-400"
+                                    )}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => setActiveTab('login')}
+                                className="text-sm font-medium text-slate-400 hover:text-indigo-400 transition-colors"
+                            >
+                                Login
+                            </button>
+                        </div>
 
-                    {/* Mobile Menu Button */}
-                    <button
-                        className="md:hidden p-2 text-slate-400 hover:text-white"
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    >
-                        {isMobileMenuOpen ? <X /> : <Menu />}
-                    </button>
-                </div>
+                        <div className="flex items-center gap-4 flex-none">
+                            <button
+                                onClick={handleAction}
+                                className="rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/20 active:scale-95"
+                            >
+                                {currentUser ? 'Go to App' : 'Get Started'}
+                            </button>
+
+                            {/* Mobile Menu Button */}
+                            <button
+                                className="md:hidden p-2 text-slate-400 hover:text-white"
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            >
+                                {isMobileMenuOpen ? <X /> : <Menu />}
+                            </button>
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Mobile Nav */}
             <AnimatePresence>
-                {isMobileMenuOpen && (
+                {!isAuthView && isMobileMenuOpen && (
                     <motion.div
                         initial={{ opacity: 0, y: -20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -121,6 +141,15 @@ const Navbar = ({ activeTab, setActiveTab, isMobileMenuOpen, setIsMobileMenuOpen
                                     {item.label}
                                 </button>
                             ))}
+                            <button
+                                onClick={() => {
+                                    setActiveTab('login');
+                                    setIsMobileMenuOpen(false);
+                                }}
+                                className="block w-full rounded-lg px-4 py-3 text-left text-sm font-medium text-indigo-400 hover:bg-indigo-500/10 transition-colors"
+                            >
+                                Login
+                            </button>
                         </div>
                     </motion.div>
                 )}
@@ -701,18 +730,20 @@ const MegaFooter = () => {
     );
 };
 
-function ModernApp() {
-    const [activeTab, setActiveTab] = useState('home');
+const ModernApp = ({ initialTab = 'home' }: { initialTab?: string }) => {
+    const [activeTab, setActiveTab] = useState(initialTab);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-indigo-500/30">
-            <Navbar
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                isMobileMenuOpen={isMobileMenuOpen}
-                setIsMobileMenuOpen={setIsMobileMenuOpen}
-            />
+            {activeTab !== 'login' && activeTab !== 'signup' && (
+                <Navbar
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    isMobileMenuOpen={isMobileMenuOpen}
+                    setIsMobileMenuOpen={setIsMobileMenuOpen}
+                />
+            )}
 
             <main className="relative z-10">
                 <AnimatePresence mode="wait">
@@ -760,10 +791,40 @@ function ModernApp() {
                             <Contact />
                         </motion.div>
                     )}
+                    {activeTab === 'login' && (
+                        <motion.div
+                            key="login"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <Login
+                                isInternal
+                                onBack={() => setActiveTab('home')}
+                                onSwitchToSignup={() => setActiveTab('signup')}
+                            />
+                        </motion.div>
+                    )}
+                    {activeTab === 'signup' && (
+                        <motion.div
+                            key="signup"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <SignUp
+                                isInternal
+                                onBack={() => setActiveTab('home')}
+                                onSwitchToLogin={() => setActiveTab('login')}
+                            />
+                        </motion.div>
+                    )}
                 </AnimatePresence>
             </main>
 
-            <MegaFooter />
+            {(activeTab !== 'login' && activeTab !== 'signup') && <MegaFooter />}
         </div>
     );
 }
