@@ -247,11 +247,12 @@ const ProblemSolution = () => (
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
-                    className="rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-8"
+                    className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-8 backdrop-blur-sm relative overflow-hidden group"
                 >
+                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="rounded-full bg-emerald-500/10 p-2">
-                            <Check className="h-6 w-6 text-emerald-500" />
+                        <div className="rounded-full bg-indigo-500/20 p-2 ring-1 ring-indigo-500/50">
+                            <Check className="h-6 w-6 text-indigo-400" />
                         </div>
                         <h3 className="text-xl font-bold text-white">The PromptMaker Way</h3>
                     </div>
@@ -262,8 +263,8 @@ const ProblemSolution = () => (
                             "Optimized token usage",
                             "Predictable, high-quality outputs"
                         ].map((item, i) => (
-                            <li key={i} className="flex items-start gap-3 text-slate-400">
-                                <Check className="h-5 w-5 text-emerald-500 mt-0.5 shrink-0" />
+                            <li key={i} className="flex items-start gap-3 text-slate-300">
+                                <Check className="h-5 w-5 text-indigo-400 mt-0.5 shrink-0" />
                                 <span>{item}</span>
                             </li>
                         ))}
@@ -383,11 +384,6 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Problem Section */}
-            <ProblemSolution />
-
-            {/* Features Grid */}
-
             {/* Features Grid */}
             <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="mb-16 text-center">
@@ -412,6 +408,9 @@ const Home = () => {
                     />
                 </div>
             </section>
+
+            {/* Problem Section */}
+            <ProblemSolution />
 
             {/* FAQ (Home) */}
             <div className="border-t border-white/5">
@@ -596,21 +595,39 @@ const Contact = () => (
 
 const MegaFooter = () => {
     const [typedText, setTypedText] = useState('');
-    const fullText = "Level up.";
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [loopNum, setLoopNum] = useState(0);
+    const [typingSpeed, setTypingSpeed] = useState(150);
+
+    const phrases = ["Level up.", "Scale up.", "Ship faster.", "Go viral."];
     const footerRef = useRef(null);
-    const isInView = useInView(footerRef, { once: true, amount: 0.3 });
+    const isInView = useInView(footerRef, { once: false, amount: 0.1 });
 
     useEffect(() => {
-        if (isInView) {
-            let i = 0;
-            const timer = setInterval(() => {
-                setTypedText(fullText.substring(0, i + 1));
-                i++;
-                if (i === fullText.length) clearInterval(timer);
-            }, 150);
-            return () => clearInterval(timer);
-        }
-    }, [isInView]);
+        if (!isInView) return;
+
+        const i = loopNum % phrases.length;
+        const fullText = phrases[i];
+
+        const handleTyping = () => {
+            setTypedText(isDeleting
+                ? fullText.substring(0, typedText.length - 1)
+                : fullText.substring(0, typedText.length + 1)
+            );
+
+            setTypingSpeed(isDeleting ? 50 : 150);
+
+            if (!isDeleting && typedText === fullText) {
+                setTimeout(() => setIsDeleting(true), 2000);
+            } else if (isDeleting && typedText === '') {
+                setIsDeleting(false);
+                setLoopNum(loopNum + 1);
+            }
+        };
+
+        const timer = setTimeout(handleTyping, typingSpeed);
+        return () => clearTimeout(timer);
+    }, [typedText, isDeleting, loopNum, isInView, typingSpeed]);
 
     return (
         <footer ref={footerRef} className="border-t border-white/5 bg-slate-950 pt-24 pb-12">
