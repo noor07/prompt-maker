@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -15,7 +15,9 @@ import {
     Menu,
     X,
     Copy,
-    Check
+    Check,
+    Globe,
+    ArrowRight
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -162,7 +164,7 @@ const TerminalHero = () => {
 
         const timer = setTimeout(handleTyping, typingSpeed);
         return () => clearTimeout(timer);
-    }, [text, isDeleting, loopNum]); // Removed typingSpeed dependent to avoid rapid re-renders on speed change during wait
+    }, [text, isDeleting, loopNum]);
 
     return (
         <div className="relative w-full max-w-lg rounded-xl border border-white/5 bg-slate-950/50 shadow-2xl backdrop-blur-xl">
@@ -203,6 +205,74 @@ const TerminalHero = () => {
         </div>
     );
 };
+
+const ProblemSolution = () => (
+    <div className="py-24 bg-slate-900/30 border-y border-white/5">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+                <h2 className="text-3xl font-bold text-white sm:text-4xl">Stop wasting time</h2>
+                <p className="mt-4 text-lg text-slate-400">The difference between guessing and engineering.</p>
+            </div>
+            <div className="grid md:grid-cols-2 gap-8">
+                {/* Old Way */}
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    className="rounded-2xl border border-red-500/10 bg-red-500/5 p-8"
+                >
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="rounded-full bg-red-500/10 p-2">
+                            <X className="h-6 w-6 text-red-500" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white">The Old Way</h3>
+                    </div>
+                    <ul className="space-y-4">
+                        {[
+                            "Vague instructions leading to generic output",
+                            "Endless trial-and-error loops",
+                            "Wasted API tokens and costs",
+                            "Frustration and inconsistent results"
+                        ].map((item, i) => (
+                            <li key={i} className="flex items-start gap-3 text-slate-400">
+                                <X className="h-5 w-5 text-red-500/50 mt-0.5 shrink-0" />
+                                <span>{item}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </motion.div>
+
+                {/* New Way */}
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    className="rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-8"
+                >
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="rounded-full bg-emerald-500/10 p-2">
+                            <Check className="h-6 w-6 text-emerald-500" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white">The PromptMaker Way</h3>
+                    </div>
+                    <ul className="space-y-4">
+                        {[
+                            "Structured frameworks (CO-STAR, RTF)",
+                            "Perfect 1st shot results",
+                            "Optimized token usage",
+                            "Predictable, high-quality outputs"
+                        ].map((item, i) => (
+                            <li key={i} className="flex items-start gap-3 text-slate-400">
+                                <Check className="h-5 w-5 text-emerald-500 mt-0.5 shrink-0" />
+                                <span>{item}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </motion.div>
+            </div>
+        </div>
+    </div>
+);
 
 const FeatureCard = ({ icon: Icon, title, description }: any) => (
     <motion.div
@@ -313,6 +383,11 @@ const Home = () => {
                 </div>
             </section>
 
+            {/* Problem Section */}
+            <ProblemSolution />
+
+            {/* Features Grid */}
+
             {/* Features Grid */}
             <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="mb-16 text-center">
@@ -337,6 +412,11 @@ const Home = () => {
                     />
                 </div>
             </section>
+
+            {/* FAQ (Home) */}
+            <div className="border-t border-white/5">
+                <FAQ />
+            </div>
         </div>
     );
 };
@@ -391,33 +471,54 @@ const Features = () => (
 );
 
 const FAQ = () => {
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+
     const faqs = [
-        { q: "Is Prompt Maker free to use?", a: "Yes, we offer a generous free tier that allows for 50 prompt generations per day. Pro plans are available for power users." },
-        { q: "Which AI models do you support?", a: "Our optimized prompts are model-agnostic but perform exceptionally well with GPT-4, Claude 3.5 Sonnet, and Google Gemini 1.5 Pro." },
-        { q: "Can I save my prompts?", a: "Absolutely. Create an account to save your library, version your prompts, and share them with your team." },
-        { q: "Do you offer an API?", a: "Yes! Our API allows you to integrate our prompt optimization engine directly into your own applications." },
+        { q: "Why can't I just talk to ChatGPT normally?", a: "You can, but lack of structure often leads to average results. PromptMaker applies proven engineering frameworks to ensure your intent is perfectly understood by the AI." },
+        { q: "Does this work for Midjourney/Image gen?", a: "Yes! Our system handles parameter weighting and stylistic descriptors automatically, making it perfect for image generation models." },
+        { q: "Is my data secure?", a: "Absolutely. We do not store your API keys, and your prompts are only saved if you explicitly choose to save them to your library." },
+        { q: "Can I share prompts with my team?", a: "Yes, the Pro plan includes team workspaces where you can share, version, and collaborate on your prompt library." },
     ];
 
     return (
         <div className="pt-32 pb-24 mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
                 className="text-center mb-16"
             >
                 <h2 className="text-3xl font-bold text-white sm:text-4xl">Frequently Asked Questions</h2>
             </motion.div>
-            <div className="space-y-6">
+            <div className="space-y-4">
                 {faqs.map((faq, i) => (
                     <motion.div
                         key={i}
                         initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
                         transition={{ delay: i * 0.1 }}
-                        className="rounded-xl border border-white/5 bg-white/5 p-6 transition-all hover:bg-white/10 hover:border-white/10"
+                        className="rounded-xl border border-white/5 bg-white/5 overflow-hidden"
                     >
-                        <h3 className="text-lg font-semibold text-white mb-2">{faq.q}</h3>
-                        <p className="text-slate-400">{faq.a}</p>
+                        <button
+                            onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                            className="flex items-center justify-between w-full p-6 text-left"
+                        >
+                            <span className="text-lg font-semibold text-white">{faq.q}</span>
+                            <ChevronRight className={cn("h-5 w-5 text-slate-400 transition-transform", openIndex === i && "rotate-90")} />
+                        </button>
+                        <AnimatePresence>
+                            {openIndex === i && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="px-6 pb-6 text-slate-400"
+                                >
+                                    {faq.a}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </motion.div>
                 ))}
             </div>
@@ -493,48 +594,95 @@ const Contact = () => (
     </div>
 );
 
-const Footer = () => (
-    <footer className="border-t border-white/5 bg-slate-950 py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-4 gap-8">
-                <div className="col-span-1 md:col-span-2">
-                    <div className="flex items-center gap-2 mb-4">
-                        <Sparkles className="h-6 w-6 text-indigo-400" />
-                        <span className="text-xl font-bold text-white">Prompt Maker</span>
+const MegaFooter = () => {
+    const [typedText, setTypedText] = useState('');
+    const fullText = "Level up.";
+    const footerRef = useRef(null);
+    const isInView = useInView(footerRef, { once: true, amount: 0.3 });
+
+    useEffect(() => {
+        if (isInView) {
+            let i = 0;
+            const timer = setInterval(() => {
+                setTypedText(fullText.substring(0, i + 1));
+                i++;
+                if (i === fullText.length) clearInterval(timer);
+            }, 150);
+            return () => clearInterval(timer);
+        }
+    }, [isInView]);
+
+    return (
+        <footer ref={footerRef} className="border-t border-white/5 bg-slate-950 pt-24 pb-12">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                {/* Top Row: Newsletter */}
+                <div className="flex flex-col items-center text-center mb-24">
+                    <h3 className="text-2xl font-bold text-white mb-6">Join the elite.</h3>
+                    <div className="flex w-full max-w-md gap-2">
+                        <input
+                            type="email"
+                            placeholder="Enter your email"
+                            className="flex-1 rounded-full bg-slate-900 border border-white/10 px-6 py-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                        <button className="rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-8 py-4 font-bold text-white transition-transform hover:scale-105 active:scale-95 flex items-center gap-2">
+                            Subscribe <ArrowRight className="h-4 w-4" />
+                        </button>
                     </div>
-                    <p className="text-slate-400 max-w-xs text-sm">
-                        Empowering creators and developers to harness the full potential of AI through precision prompt engineering.
-                    </p>
                 </div>
-                <div>
-                    <h3 className="font-semibold text-white mb-4">Product</h3>
-                    <ul className="space-y-2 text-sm text-slate-400">
-                        <li className="hover:text-indigo-400 cursor-pointer">Features</li>
-                        <li className="hover:text-indigo-400 cursor-pointer">Integrations</li>
-                        <li className="hover:text-indigo-400 cursor-pointer">Pricing</li>
-                        <li className="hover:text-indigo-400 cursor-pointer">Changelog</li>
-                    </ul>
+
+                {/* Middle Row: Big Typography */}
+                <div className="mb-24 text-center">
+                    <h1 className="text-6xl md:text-9xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white/20 to-white/5 select-none">
+                        {typedText}
+                        <span className="animate-pulse text-indigo-500">_</span>
+                    </h1>
                 </div>
-                <div>
-                    <h3 className="font-semibold text-white mb-4">Company</h3>
-                    <ul className="space-y-2 text-sm text-slate-400">
-                        <li className="hover:text-indigo-400 cursor-pointer">About</li>
-                        <li className="hover:text-indigo-400 cursor-pointer">Blog</li>
-                        <li className="hover:text-indigo-400 cursor-pointer">Careers</li>
-                        <li className="hover:text-indigo-400 cursor-pointer">Legal</li>
-                    </ul>
+
+                {/* Bottom Row */}
+                <div className="grid md:grid-cols-4 gap-12 border-t border-white/5 pt-12">
+                    <div className="col-span-1 space-y-6">
+                        <div className="flex items-center gap-2">
+                            <Sparkles className="h-6 w-6 text-indigo-400" />
+                            <span className="text-xl font-bold text-white">Prompt Maker</span>
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="p-2 rounded-full bg-white/5 hover:bg-white/10 cursor-pointer transition-colors">
+                                <Twitter className="h-5 w-5 text-slate-400" />
+                            </div>
+                            <div className="p-2 rounded-full bg-white/5 hover:bg-white/10 cursor-pointer transition-colors">
+                                <Github className="h-5 w-5 text-slate-400" />
+                            </div>
+                            <div className="p-2 rounded-full bg-white/5 hover:bg-white/10 cursor-pointer transition-colors">
+                                <Mail className="h-5 w-5 text-slate-400" />
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-slate-500 cursor-pointer hover:text-white transition-colors">
+                            <Globe className="h-4 w-4" />
+                            <span>English (US)</span>
+                        </div>
+                    </div>
+
+                    {['Product', 'Company', 'Resources'].map((col) => (
+                        <div key={col}>
+                            <h4 className="font-semibold text-white mb-6">{col}</h4>
+                            <ul className="space-y-4 text-sm text-slate-400">
+                                {[1, 2, 3, 4].map((i) => (
+                                    <li key={i} className="hover:text-indigo-400 cursor-pointer transition-colors">
+                                        Link Item {i}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="mt-12 text-center text-xs text-slate-600">
+                    © 2024 Prompt Maker AI. All rights reserved.
                 </div>
             </div>
-            <div className="mt-12 border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p className="text-xs text-slate-500">© 2024 Prompt Maker AI. All rights reserved.</p>
-                <div className="flex gap-4">
-                    <Github className="h-5 w-5 text-slate-500 hover:text-white cursor-pointer" />
-                    <Twitter className="h-5 w-5 text-slate-500 hover:text-white cursor-pointer" />
-                </div>
-            </div>
-        </div>
-    </footer>
-);
+        </footer>
+    );
+};
 
 function ModernApp() {
     const [activeTab, setActiveTab] = useState('home');
@@ -598,7 +746,7 @@ function ModernApp() {
                 </AnimatePresence>
             </main>
 
-            <Footer />
+            <MegaFooter />
         </div>
     );
 }
