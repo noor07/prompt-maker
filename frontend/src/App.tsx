@@ -8,7 +8,7 @@ import { Login } from './components/Login';
 import { SignUp } from './components/SignUp';
 import { Dashboard } from './components/Dashboard';
 import { PrivateRoute } from './components/PrivateRoute';
-import { LandingPage } from './components/LandingPage';
+import ModernApp from './components/ModernApp';
 import { About } from './components/About';
 import { Contact } from './components/Contact';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -33,7 +33,7 @@ function PromptGenerator() {
     setGeneratedPrompt('');
 
     try {
-      const response = await axios.post('http://localhost:3000/generate', {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/generate`, {
         keywords,
         taskType,
         targetPlatform,
@@ -122,7 +122,7 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<ModernApp />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />

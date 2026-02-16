@@ -1,0 +1,606 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import {
+    Terminal,
+    Sparkles,
+    Code2,
+    Zap,
+    MessageSquare,
+    Mail,
+    Github,
+    Twitter,
+    ChevronRight,
+    Menu,
+    X,
+    Copy,
+    Check
+} from 'lucide-react';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+// --- Utility ---
+function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
+}
+
+// --- Components ---
+
+const Navbar = ({ activeTab, setActiveTab, isMobileMenuOpen, setIsMobileMenuOpen }: any) => {
+    const navigate = useNavigate();
+    const { currentUser } = useAuth();
+
+    const navItems = [
+        { id: 'home', label: 'Home' },
+        { id: 'features', label: 'Features' },
+        { id: 'faq', label: 'FAQ' },
+        { id: 'contact', label: 'Contact' },
+    ];
+
+    const handleAction = () => {
+        if (currentUser) {
+            navigate('/app');
+        } else {
+            navigate('/login');
+        }
+    };
+
+    return (
+        <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl rounded-full border border-white/10 bg-black/40 backdrop-blur-xl z-50 px-6 py-4 shadow-lg shadow-purple-500/10">
+            <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-2 cursor-pointer flex-none" onClick={() => setActiveTab('home')}>
+                    <div className="rounded-lg bg-indigo-500/10 p-2">
+                        <Sparkles className="h-5 w-5 text-indigo-400" />
+                    </div>
+                    <span className="text-lg font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent hidden sm:block">
+                        Prompt Maker
+                    </span>
+                </div>
+
+                {/* Desktop Nav */}
+                <div className="hidden md:flex items-center justify-center gap-8 flex-1">
+                    {navItems.map((item) => (
+                        <button
+                            key={item.id}
+                            onClick={() => setActiveTab(item.id)}
+                            className={cn(
+                                "text-sm font-medium transition-colors hover:text-indigo-400",
+                                activeTab === item.id ? "text-indigo-400" : "text-slate-400"
+                            )}
+                        >
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="flex items-center gap-4 flex-none">
+                    <button
+                        onClick={handleAction}
+                        className="rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/20 active:scale-95"
+                    >
+                        {currentUser ? 'Go to App' : 'Get Started'}
+                    </button>
+
+                    {/* Mobile Menu Button */}
+                    <button
+                        className="md:hidden p-2 text-slate-400 hover:text-white"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    >
+                        {isMobileMenuOpen ? <X /> : <Menu />}
+                    </button>
+                </div>
+            </div>
+
+            {/* Mobile Nav */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                        className="absolute top-full left-0 right-0 mt-4 mx-auto w-full max-w-sm rounded-2xl border border-white/10 bg-black/80 backdrop-blur-xl p-4 md:hidden shadow-2xl"
+                    >
+                        <div className="space-y-1">
+                            {navItems.map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => {
+                                        setActiveTab(item.id);
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className={cn(
+                                        "block w-full rounded-lg px-4 py-3 text-left text-sm font-medium transition-colors",
+                                        activeTab === item.id
+                                            ? "bg-indigo-500/10 text-indigo-400"
+                                            : "text-slate-400 hover:bg-white/5 hover:text-white"
+                                    )}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </nav>
+    );
+};
+
+const TerminalHero = () => {
+    const [text, setText] = useState('');
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [loopNum, setLoopNum] = useState(0);
+    const [typingSpeed, setTypingSpeed] = useState(50);
+
+    const scenarios = [
+        "Generate a production-ready React component for a landing page...",
+        "Write a python script to scrape stock prices from Yahoo Finance...",
+        "Create a 30-day social media content calendar for a coffee brand...",
+        "Explain quantum computing to a 5-year old..."
+    ];
+
+    useEffect(() => {
+        const i = loopNum % scenarios.length;
+        const fullText = scenarios[i];
+
+        const handleTyping = () => {
+            setText(isDeleting
+                ? fullText.substring(0, text.length - 1)
+                : fullText.substring(0, text.length + 1)
+            );
+
+            setTypingSpeed(isDeleting ? 30 : 50);
+
+            if (!isDeleting && text === fullText) {
+                setTimeout(() => setIsDeleting(true), 1500);
+            } else if (isDeleting && text === '') {
+                setIsDeleting(false);
+                setLoopNum(loopNum + 1);
+            }
+        };
+
+        const timer = setTimeout(handleTyping, typingSpeed);
+        return () => clearTimeout(timer);
+    }, [text, isDeleting, loopNum]); // Removed typingSpeed dependent to avoid rapid re-renders on speed change during wait
+
+    return (
+        <div className="relative w-full max-w-lg rounded-xl border border-white/5 bg-slate-950/50 shadow-2xl backdrop-blur-xl">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-indigo-500/20 blur-[100px] -z-10 rounded-full" />
+            <div className="flex items-center gap-2 border-b border-white/5 bg-white/5 px-4 py-3">
+                <div className="flex gap-2">
+                    <div className="h-3 w-3 rounded-full bg-red-500/20 border border-red-500/50" />
+                    <div className="h-3 w-3 rounded-full bg-yellow-500/20 border border-yellow-500/50" />
+                    <div className="h-3 w-3 rounded-full bg-green-500/20 border border-green-500/50" />
+                </div>
+                <div className="ml-2 text-xs font-medium text-slate-500 flex items-center gap-1">
+                    <Terminal className="h-3 w-3" />
+                    prompt-maker — v2.0
+                </div>
+            </div>
+            <div className="p-4 font-mono text-sm">
+                <div className="flex gap-2">
+                    <span className="text-green-400">➜</span>
+                    <span className="text-indigo-400">~</span>
+                    <span className="text-slate-300">generate-prompt</span>
+                </div>
+                <div className="mt-2 text-slate-300 min-h-[80px]">
+                    {text}
+                    <span className="animate-pulse bg-slate-500 w-2 h-4 inline-block align-middle ml-1" />
+                </div>
+                <div className="mt-4 rounded bg-slate-900 p-3 text-xs text-slate-400 border border-white/5">
+                    <div className="flex justify-between items-center mb-2">
+                        <span className="text-slate-500">Output Preview</span>
+                        <Copy className="h-3 w-3 cursor-pointer hover:text-white" />
+                    </div>
+                    <div className="space-y-1">
+                        <div className="w-3/4 h-2 bg-slate-800 rounded animate-pulse" />
+                        <div className="w-1/2 h-2 bg-slate-800 rounded animate-pulse" />
+                        <div className="w-full h-2 bg-slate-800 rounded animate-pulse" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const FeatureCard = ({ icon: Icon, title, description }: any) => (
+    <motion.div
+        whileHover={{ y: -5 }}
+        className="group relative rounded-2xl border border-white/5 bg-white/5 p-8 transition-colors hover:bg-white/10"
+    >
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-indigo-500/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100 rounded-2xl" />
+        <div className="mb-4 inline-block rounded-lg bg-indigo-500/10 p-3 text-indigo-400 ring-1 ring-indigo-500/20">
+            <Icon className="h-6 w-6" />
+        </div>
+        <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
+        <p className="text-slate-400 leading-relaxed">{description}</p>
+    </motion.div>
+);
+
+const Home = () => {
+    const navigate = useNavigate();
+    const { currentUser } = useAuth();
+
+    // Headline Animation State
+    const [headlineText, setHeadlineText] = useState('');
+    const [isHeadlineDeleting, setIsHeadlineDeleting] = useState(false);
+    const [headlineLoopNum, setHeadlineLoopNum] = useState(0);
+    const [headlineTypingSpeed, setHeadlineTypingSpeed] = useState(150);
+    const headlineWords = ["Prompt", "Script", "Image", "Video", "Analysis", "Code"];
+
+    useEffect(() => {
+        const i = headlineLoopNum % headlineWords.length;
+        const fullWord = headlineWords[i];
+
+        const handleHeadlineTyping = () => {
+            setHeadlineText(isHeadlineDeleting
+                ? fullWord.substring(0, headlineText.length - 1)
+                : fullWord.substring(0, headlineText.length + 1)
+            );
+
+            setHeadlineTypingSpeed(isHeadlineDeleting ? 50 : 150);
+
+            if (!isHeadlineDeleting && headlineText === fullWord) {
+                setTimeout(() => setIsHeadlineDeleting(true), 2000); // Wait 2s
+            } else if (isHeadlineDeleting && headlineText === '') {
+                setIsHeadlineDeleting(false);
+                setHeadlineLoopNum(headlineLoopNum + 1);
+            }
+        };
+
+        const timer = setTimeout(handleHeadlineTyping, headlineTypingSpeed);
+        return () => clearTimeout(timer);
+    }, [headlineText, isHeadlineDeleting, headlineLoopNum]);
+
+    const handleAction = () => {
+        if (currentUser) {
+            navigate('/app');
+        } else {
+            navigate('/login');
+        }
+    };
+
+    return (
+        <div className="space-y-32 pb-24">
+            {/* Hero Section */}
+            <section className="relative pt-32 lg:pt-48">
+                <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
+                    <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]" />
+                </div>
+
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className="grid lg:grid-cols-2 gap-12 items-center">
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-7xl mb-6 leading-[1.1]">
+                                Craft the perfect <br />
+                                <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                                    {headlineText}
+                                </span>
+                                <span className="animate-pulse text-indigo-400">|</span>
+                            </h1>
+                            <p className="text-lg leading-8 text-slate-400 mb-8 max-w-xl">
+                                Stop guessing. Start generating. Our AI-powered prompt engineer turns your vague ideas into precise, high-performance instructions for any LLM.
+                            </p>
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={handleAction}
+                                    className="rounded-full bg-indigo-600 px-8 py-3 text-sm font-semibold text-white transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-95 flex items-center gap-2"
+                                >
+                                    {currentUser ? 'Go to App' : 'Start Generating'} <ChevronRight className="h-4 w-4" />
+                                </button>
+                                <button className="rounded-full px-8 py-3 text-sm font-semibold text-slate-300 transition-all hover:text-white hover:bg-slate-800">
+                                    View Examples
+                                </button>
+                            </div>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.5, delay: 0.3 }}
+                            className="flex justify-center lg:justify-end relative"
+                        >
+                            {/* Spotlight Effect */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/20 blur-[120px] -z-10 rounded-full" />
+                            <TerminalHero />
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Features Grid */}
+            <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="mb-16 text-center">
+                    <h2 className="text-3xl font-bold text-white sm:text-4xl">Everything you need</h2>
+                    <p className="mt-4 text-lg text-slate-400">Master the art of prompt engineering with our advanced toolkit.</p>
+                </div>
+                <div className="grid md:grid-cols-3 gap-8">
+                    <FeatureCard
+                        icon={Code2}
+                        title="Optimized Structure"
+                        description="Our algorithms restructure your input using proven prompt engineering frameworks (CO-STAR, RTF) for maximum clarity."
+                    />
+                    <FeatureCard
+                        icon={Zap}
+                        title="Instant Refinement"
+                        description="Turn a one-line request into a comprehensive, multi-step prompt in milliseconds. Compatible with GPT-4, Claude, and Gemini."
+                    />
+                    <FeatureCard
+                        icon={MessageSquare}
+                        title="Context Awareness"
+                        description="Add variables, constraints, and tonal instructions easily. We handle the formatting so you can focus on the idea."
+                    />
+                </div>
+            </section>
+        </div>
+    );
+};
+
+const Features = () => (
+    <div className="pt-32 pb-24 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-16"
+        >
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Advanced Features</h2>
+            <p className="mt-4 text-lg text-slate-400">Deep dive into what makes Prompt Maker special</p>
+        </motion.div>
+
+        <div className="grid gap-12">
+            {[1, 2, 3].map((_, i) => (
+                <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className={cn(
+                        "flex flex-col gap-8 md:items-center",
+                        i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+                    )}
+                >
+                    <div className="flex-1 space-y-4">
+                        <div className="inline-flex rounded-lg bg-indigo-500/10 p-3 text-indigo-400">
+                            <Sparkles className="h-6 w-6" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white">Smart Context Injection</h3>
+                        <p className="text-slate-400 text-lg leading-relaxed">
+                            Typically, LLMs struggle with ambiguity. Our system automatically identifies missing context in your request and prompts you for clarification, ensuring the final output is exactly what you envisioned.
+                        </p>
+                        <ul className="space-y-2 text-slate-300">
+                            {['Auto-detected variables', 'Tone analysis', 'Format standardization'].map((item) => (
+                                <li key={item} className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-indigo-400" /> {item}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div className="flex-1 rounded-2xl border border-white/5 bg-slate-900/50 p-8 h-64 flex items-center justify-center relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent" />
+                        <span className="text-slate-600 font-medium tracking-wide">Visualization Placeholder</span>
+                    </div>
+                </motion.div>
+            ))}
+        </div>
+    </div>
+);
+
+const FAQ = () => {
+    const faqs = [
+        { q: "Is Prompt Maker free to use?", a: "Yes, we offer a generous free tier that allows for 50 prompt generations per day. Pro plans are available for power users." },
+        { q: "Which AI models do you support?", a: "Our optimized prompts are model-agnostic but perform exceptionally well with GPT-4, Claude 3.5 Sonnet, and Google Gemini 1.5 Pro." },
+        { q: "Can I save my prompts?", a: "Absolutely. Create an account to save your library, version your prompts, and share them with your team." },
+        { q: "Do you offer an API?", a: "Yes! Our API allows you to integrate our prompt optimization engine directly into your own applications." },
+    ];
+
+    return (
+        <div className="pt-32 pb-24 mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center mb-16"
+            >
+                <h2 className="text-3xl font-bold text-white sm:text-4xl">Frequently Asked Questions</h2>
+            </motion.div>
+            <div className="space-y-6">
+                {faqs.map((faq, i) => (
+                    <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="rounded-xl border border-white/5 bg-white/5 p-6 transition-all hover:bg-white/10 hover:border-white/10"
+                    >
+                        <h3 className="text-lg font-semibold text-white mb-2">{faq.q}</h3>
+                        <p className="text-slate-400">{faq.a}</p>
+                    </motion.div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+const Contact = () => (
+    <div className="pt-32 pb-24 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid md:grid-cols-2 gap-16">
+            <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="space-y-8"
+            >
+                <div>
+                    <h2 className="text-3xl font-bold text-white sm:text-4xl">Get in touch</h2>
+                    <p className="mt-4 text-lg text-slate-400">Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+                </div>
+
+                <div className="space-y-6">
+                    <div className="flex items-center gap-4 text-slate-300">
+                        <div className="rounded-lg bg-white/5 border border-white/5 p-3">
+                            <Mail className="h-6 w-6 text-indigo-400" />
+                        </div>
+                        <span>support@promptmaker.ai</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-slate-300">
+                        <div className="rounded-lg bg-white/5 border border-white/5 p-3">
+                            <Github className="h-6 w-6 text-indigo-400" />
+                        </div>
+                        <span>github.com/promptmaker</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-slate-300">
+                        <div className="rounded-lg bg-white/5 border border-white/5 p-3">
+                            <Twitter className="h-6 w-6 text-indigo-400" />
+                        </div>
+                        <span>@promptmaker_ai</span>
+                    </div>
+                </div>
+            </motion.div>
+
+            <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="rounded-2xl border border-white/5 bg-white/5 p-8 backdrop-blur"
+            >
+                <form className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label htmlFor="first-name" className="block text-sm font-medium text-slate-300">First name</label>
+                            <input type="text" id="first-name" className="mt-1 block w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Jane" />
+                        </div>
+                        <div>
+                            <label htmlFor="last-name" className="block text-sm font-medium text-slate-300">Last name</label>
+                            <input type="text" id="last-name" className="mt-1 block w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Doe" />
+                        </div>
+                    </div>
+                    <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-slate-300">Email</label>
+                        <input type="email" id="email" className="mt-1 block w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="jane@example.com" />
+                    </div>
+                    <div>
+                        <label htmlFor="message" className="block text-sm font-medium text-slate-300">Message</label>
+                        <textarea id="message" rows={4} className="mt-1 block w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="How can we help?" />
+                    </div>
+                    <button type="submit" className="w-full rounded-lg bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/20 active:scale-95">
+                        Send Message
+                    </button>
+                </form>
+            </motion.div>
+        </div>
+    </div>
+);
+
+const Footer = () => (
+    <footer className="border-t border-white/5 bg-slate-950 py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid md:grid-cols-4 gap-8">
+                <div className="col-span-1 md:col-span-2">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Sparkles className="h-6 w-6 text-indigo-400" />
+                        <span className="text-xl font-bold text-white">Prompt Maker</span>
+                    </div>
+                    <p className="text-slate-400 max-w-xs text-sm">
+                        Empowering creators and developers to harness the full potential of AI through precision prompt engineering.
+                    </p>
+                </div>
+                <div>
+                    <h3 className="font-semibold text-white mb-4">Product</h3>
+                    <ul className="space-y-2 text-sm text-slate-400">
+                        <li className="hover:text-indigo-400 cursor-pointer">Features</li>
+                        <li className="hover:text-indigo-400 cursor-pointer">Integrations</li>
+                        <li className="hover:text-indigo-400 cursor-pointer">Pricing</li>
+                        <li className="hover:text-indigo-400 cursor-pointer">Changelog</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 className="font-semibold text-white mb-4">Company</h3>
+                    <ul className="space-y-2 text-sm text-slate-400">
+                        <li className="hover:text-indigo-400 cursor-pointer">About</li>
+                        <li className="hover:text-indigo-400 cursor-pointer">Blog</li>
+                        <li className="hover:text-indigo-400 cursor-pointer">Careers</li>
+                        <li className="hover:text-indigo-400 cursor-pointer">Legal</li>
+                    </ul>
+                </div>
+            </div>
+            <div className="mt-12 border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p className="text-xs text-slate-500">© 2024 Prompt Maker AI. All rights reserved.</p>
+                <div className="flex gap-4">
+                    <Github className="h-5 w-5 text-slate-500 hover:text-white cursor-pointer" />
+                    <Twitter className="h-5 w-5 text-slate-500 hover:text-white cursor-pointer" />
+                </div>
+            </div>
+        </div>
+    </footer>
+);
+
+function ModernApp() {
+    const [activeTab, setActiveTab] = useState('home');
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    return (
+        <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-indigo-500/30">
+            <Navbar
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                isMobileMenuOpen={isMobileMenuOpen}
+                setIsMobileMenuOpen={setIsMobileMenuOpen}
+            />
+
+            <main className="relative z-10">
+                <AnimatePresence mode="wait">
+                    {activeTab === 'home' && (
+                        <motion.div
+                            key="home"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <Home />
+                        </motion.div>
+                    )}
+                    {activeTab === 'features' && (
+                        <motion.div
+                            key="features"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <Features />
+                        </motion.div>
+                    )}
+                    {activeTab === 'faq' && (
+                        <motion.div
+                            key="faq"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <FAQ />
+                        </motion.div>
+                    )}
+                    {activeTab === 'contact' && (
+                        <motion.div
+                            key="contact"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <Contact />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </main>
+
+            <Footer />
+        </div>
+    );
+}
+
+export default ModernApp;
