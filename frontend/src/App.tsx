@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { PromptForm } from './components/PromptForm';
 import { PromptResult } from './components/PromptResult';
+import { HistoryView } from './components/HistoryView';
 import { Dashboard } from './components/Dashboard';
 import { PrivateRoute } from './components/PrivateRoute';
 import ModernApp from './components/ModernApp';
@@ -98,6 +99,19 @@ function PromptGenerator() {
     }
   };
 
+  const handleLoadLibraryItem = (item: any) => {
+    setKeywords(item.prompt);
+    setTaskType(item.type);
+    setModel(item.model);
+    setTone(item.tone);
+    setGeneratedPrompt(''); // Clear result when loading old prompt
+    setActiveNav('new'); // Switch to editor
+  };
+
+  const handleDeleteLibraryItem = (id: string) => {
+    // For now, just a placeholder as requested
+    console.log('Delete item:', id);
+  };
 
   return (
     <DashboardLayout
@@ -131,9 +145,10 @@ function PromptGenerator() {
         />
       )}
       {activeNav === 'history' && (
-        <div className="p-8">
-          <Dashboard />
-        </div>
+        <HistoryView
+          onLoadToEditor={handleLoadLibraryItem}
+          onDelete={handleDeleteLibraryItem}
+        />
       )}
       {activeNav === 'templates' && (
         <div className="h-full flex items-center justify-center text-slate-500">
