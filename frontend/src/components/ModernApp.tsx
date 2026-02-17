@@ -24,6 +24,7 @@ import { twMerge } from 'tailwind-merge';
 import { Login } from './Login';
 import { SignUp } from './SignUp';
 import { ForgotPassword } from './ForgotPassword';
+import { FeaturesPage } from './FeaturesPage';
 
 // --- Utility ---
 function cn(...inputs: ClassValue[]) {
@@ -35,7 +36,7 @@ function cn(...inputs: ClassValue[]) {
 const Navbar = ({ activeTab, setActiveTab, isMobileMenuOpen, setIsMobileMenuOpen }: any) => {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
-    const isAuthView = activeTab === 'login' || activeTab === 'signup' || activeTab === 'forgot-password';
+    const isAuthView = activeTab === 'login' || activeTab === 'signup' || activeTab === 'forgot-password' || activeTab === 'features';
 
     const navItems = [
         { id: 'home', label: 'Home' },
@@ -763,7 +764,7 @@ const ModernApp = ({ initialTab = 'home' }: { initialTab?: string }) => {
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-indigo-500/30">
-            {activeTab !== 'login' && activeTab !== 'signup' && activeTab !== 'forgot-password' && (
+            {activeTab !== 'login' && activeTab !== 'signup' && activeTab !== 'forgot-password' && activeTab !== 'features' && (
                 <Navbar
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
@@ -862,10 +863,21 @@ const ModernApp = ({ initialTab = 'home' }: { initialTab?: string }) => {
                             />
                         </motion.div>
                     )}
+                    {activeTab === 'features' && (
+                        <motion.div
+                            key="features"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <FeaturesPage />
+                        </motion.div>
+                    )}
                 </AnimatePresence>
             </main>
 
-            {(activeTab !== 'login' && activeTab !== 'signup' && activeTab !== 'forgot-password') && <MegaFooter />}
+            {(activeTab !== 'login' && activeTab !== 'signup' && activeTab !== 'forgot-password' && activeTab !== 'features') && <MegaFooter />}
         </div>
     );
 }

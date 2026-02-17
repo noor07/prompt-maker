@@ -9,6 +9,7 @@ import { PrivateRoute } from './components/PrivateRoute';
 import ModernApp from './components/ModernApp';
 import { About } from './components/About';
 import { Contact } from './components/Contact';
+import { FeaturesPage } from './components/FeaturesPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { signOut } from 'firebase/auth';
 import { auth } from './firebase';
@@ -123,6 +124,7 @@ function App() {
           <Route path="/" element={<ModernApp />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/features" element={<FeaturesPage />} />
           <Route path="/login" element={<ModernApp initialTab="login" />} />
           <Route path="/signup" element={<ModernApp initialTab="signup" />} />
           <Route path="/forgot-password" element={<ModernApp initialTab="forgot-password" />} />
