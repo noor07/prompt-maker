@@ -17,7 +17,11 @@ import {
     Image as ImageIcon,
     Cpu,
     Globe,
-    Layers
+    Layers,
+    MessageSquare,
+    Code,
+    Mic,
+    Briefcase
 } from 'lucide-react';
 import type { ClassValue } from 'clsx';
 import { clsx } from 'clsx';
@@ -53,13 +57,85 @@ const MODES = [
     { value: 'image', label: 'Image Generation', icon: ImageIcon },
 ];
 
-const PLATFORMS = [
-    { value: 'ChatGPT', label: 'ChatGPT', icon: Zap },
-    { value: 'Claude', label: 'Claude', icon: Layers },
-    { value: 'Gemini', label: 'Gemini', icon: Sparkles },
-    { value: 'DeepSeek', label: 'DeepSeek', icon: Cpu },
-    { value: 'Midjourney', label: 'Midjourney', icon: ImageIcon },
-    { value: 'Stable Diffusion', label: 'Stable Diffusion', icon: Globe },
+const PLATFORM_CATEGORIES = [
+    {
+        name: "Text & Chat Models",
+        icon: MessageSquare,
+        options: [
+            { value: 'ChatGPT', label: 'ChatGPT' },
+            { value: 'Gemini', label: 'Gemini' },
+            { value: 'Claude', label: 'Claude' },
+            { value: 'DeepSeek', label: 'DeepSeek' },
+            { value: 'Perplexity', label: 'Perplexity' },
+            { value: 'Grok', label: 'Grok' },
+            { value: 'Jasper', label: 'Jasper / Copy.ai' },
+            { value: 'Notion', label: 'Notion AI / Grammarly' },
+            { value: 'Sudowrite', label: 'Sudowrite' },
+        ]
+    },
+    {
+        name: "Image Generation",
+        icon: ImageIcon,
+        options: [
+            { value: 'Midjourney', label: 'Midjourney' },
+            { value: 'DALLE', label: 'DALL-E' },
+            { value: 'Stable Diffusion', label: 'Stable Diffusion' },
+            { value: 'Firefly', label: 'Adobe Firefly' },
+            { value: 'Ideogram', label: 'Ideogram' },
+            { value: 'Leonardo', label: 'Leonardo.ai' },
+            { value: 'Canva', label: 'Canva Magic Media' },
+            { value: 'Recraft', label: 'Recraft / Krea AI' },
+            { value: 'Freepik', label: 'Freepik Pikaso' },
+        ]
+    },
+    {
+        name: "Video Creation",
+        icon: Video,
+        options: [
+            { value: 'Sora', label: 'Sora' },
+            { value: 'Runway', label: 'Runway' },
+            { value: 'Veo', label: 'Google Veo' },
+            { value: 'Luma', label: 'Luma Dream Machine' },
+            { value: 'Kling', label: 'Kling AI' },
+            { value: 'HeyGen', label: 'HeyGen / Synthesia' },
+            { value: 'Higgsfield', label: 'Higgsfield' },
+            { value: 'Pika', label: 'Pika Labs' },
+            { value: 'InVideo', label: 'InVideo AI' },
+        ]
+    },
+    {
+        name: "Coding & Development",
+        icon: Code,
+        options: [
+            { value: 'Copilot', label: 'GitHub Copilot' },
+            { value: 'Cursor', label: 'Cursor / Windsurf' },
+            { value: 'Replit', label: 'Replit / Google Antigravity' },
+            { value: 'Bolt', label: 'Bolt.new / Lovable' },
+            { value: 'v0', label: 'v0.dev' },
+            { value: 'Tabnine', label: 'Tabnine' },
+        ]
+    },
+    {
+        name: "Audio & Voice",
+        icon: Mic,
+        options: [
+            { value: 'ElevenLabs', label: 'ElevenLabs' },
+            { value: 'Suno', label: 'Suno / Udio' },
+            { value: 'Murf', label: 'Murf.ai / Speechify' },
+            { value: 'StableAudio', label: 'Stable Audio' },
+        ]
+    },
+    {
+        name: "Productivity & Slides",
+        icon: Briefcase,
+        options: [
+            { value: 'Gamma', label: 'Gamma / Beautiful.ai' },
+            { value: 'Tome', label: 'Tome' },
+            { value: 'Otter', label: 'Otter.ai' },
+            { value: 'Zapier', label: 'Zapier' },
+            { value: 'Goblin', label: 'Goblin.tools' },
+        ]
+    },
 ];
 
 export const PromptForm: React.FC<PromptFormProps> = ({
@@ -76,7 +152,19 @@ export const PromptForm: React.FC<PromptFormProps> = ({
     const [isPlatformOpen, setIsPlatformOpen] = useState(false);
 
     const activeMode = MODES.find(m => m.value === taskType) || MODES[0];
-    const activePlatform = PLATFORMS.find(p => p.value === targetPlatform) || PLATFORMS[0];
+
+    // Find active platform across categories
+    let activePlatform = { value: 'ChatGPT', label: 'ChatGPT', icon: MessageSquare }; // Default
+    let activeCategoryIcon = MessageSquare;
+
+    for (const category of PLATFORM_CATEGORIES) {
+        const found = category.options.find(p => p.value === targetPlatform);
+        if (found) {
+            activePlatform = { ...found, icon: category.icon };
+            activeCategoryIcon = category.icon;
+            break;
+        }
+    }
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -165,7 +253,7 @@ export const PromptForm: React.FC<PromptFormProps> = ({
                                         }}
                                         className="flex items-center gap-2.5 px-4 py-2 bg-slate-800 border border-white/10 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-700 hover:border-white/20 hover:border-indigo-500/50 transition-all shadow-xl backdrop-blur-md h-10"
                                     >
-                                        <activePlatform.icon className="h-4 w-4 text-indigo-400" />
+                                        <activeCategoryIcon className="h-4 w-4 text-indigo-400" />
                                         <span className="hidden sm:inline">Platform:</span> {activePlatform.label}
                                         <ChevronDown className={cn("h-4 w-4 text-slate-500 transition-transform duration-300", isPlatformOpen && "rotate-180")} />
                                     </button>
@@ -178,27 +266,38 @@ export const PromptForm: React.FC<PromptFormProps> = ({
                                                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                    className="absolute bottom-full mb-2 left-0 w-56 bg-slate-800 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-20 backdrop-blur-xl"
+                                                    className="absolute bottom-full mb-2 left-0 w-64 bg-slate-800 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-20 backdrop-blur-xl"
                                                 >
-                                                    <div className="max-h-64 overflow-y-auto py-1">
-                                                        {PLATFORMS.map((platform) => (
-                                                            <button
-                                                                key={platform.value}
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    setTargetPlatform(platform.value);
-                                                                    setIsPlatformOpen(false);
-                                                                }}
-                                                                className={cn(
-                                                                    "w-full flex items-center gap-3 px-4 py-3 text-sm font-bold transition-all text-left",
-                                                                    targetPlatform === platform.value
-                                                                        ? "bg-indigo-500/10 text-indigo-400"
-                                                                        : "text-slate-400 hover:bg-white/5 hover:text-white"
-                                                                )}
-                                                            >
-                                                                <platform.icon className={cn("h-4 w-4 flex-shrink-0", targetPlatform === platform.value ? "text-indigo-400" : "text-slate-500")} />
-                                                                {platform.label}
-                                                            </button>
+                                                    <div className="max-h-60 overflow-y-auto py-1">
+                                                        {PLATFORM_CATEGORIES.map((category) => (
+                                                            <div key={category.name}>
+                                                                <div className="px-4 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10 border-b border-white/5">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <category.icon className="h-3 w-3" />
+                                                                        {category.name}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="py-1">
+                                                                    {category.options.map((platform) => (
+                                                                        <button
+                                                                            key={platform.value}
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                setTargetPlatform(platform.value);
+                                                                                setIsPlatformOpen(false);
+                                                                            }}
+                                                                            className={cn(
+                                                                                "w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold transition-all text-left pl-8", // Increased padding-left for indentation
+                                                                                targetPlatform === platform.value
+                                                                                    ? "bg-indigo-500/10 text-indigo-400"
+                                                                                    : "text-slate-400 hover:bg-white/5 hover:text-white"
+                                                                            )}
+                                                                        >
+                                                                            {platform.label}
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
                                                         ))}
                                                     </div>
                                                 </motion.div>
