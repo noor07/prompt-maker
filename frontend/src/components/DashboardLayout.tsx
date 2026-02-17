@@ -78,8 +78,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
     return (
         <div className="h-screen w-full flex bg-slate-950 text-slate-200 font-sans overflow-hidden">
-            {/* Sidebar (Left) */}
-            <aside className="w-64 flex-shrink-0 border-r border-white/5 bg-slate-900/50 backdrop-blur-xl flex flex-col">
+            {/* Left Sidebar (History) */}
+            <aside className="w-72 flex-shrink-0 flex flex-col border-r border-white/5 bg-slate-950">
                 {/* Top: Logo + New Chat */}
                 <div className="p-6 space-y-6">
                     <div
@@ -105,7 +105,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
                 {/* Middle: Navigation + Recent Prompts */}
                 <div className="flex-1 flex flex-col min-h-0">
-                    <nav className="px-4 space-y-1 py-4 border-b border-white/5">
+                    <nav className="px-4 space-y-1">
                         <SidebarItem
                             icon={Plus}
                             label="Generator"
@@ -126,30 +126,33 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                         />
                     </nav>
 
-                    <div className="flex-1 overflow-y-auto px-4 py-6 scrollbar-hide">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-4 mb-4 block">
+                    <div className="flex-1 overflow-y-auto py-4 space-y-2 scrollbar-hide">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-6 mb-2 block">
                             Recent Prompts
                         </label>
-                        <div className="space-y-1">
+                        <div className="px-3 space-y-1">
                             {recentPrompts.length > 0 ? (
                                 recentPrompts.map((prompt) => (
-                                    <SidebarItem
+                                    <div
                                         key={prompt.id}
-                                        icon={MessageSquare}
-                                        label={prompt.keywords || "Untitled Prompt"}
                                         onClick={() => {/* Navigate to prompt or load it */ }}
-                                        className="py-2 text-xs"
-                                    />
+                                        className="group flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
+                                    >
+                                        <MessageSquare className="w-4 h-4 text-slate-500 group-hover:text-indigo-400" />
+                                        <span className="text-sm text-slate-400 group-hover:text-white truncate">
+                                            {prompt.keywords || "Untitled Prompt"}
+                                        </span>
+                                    </div>
                                 ))
                             ) : (
-                                <p className="px-4 text-xs text-slate-600 italic">No recent prompts</p>
+                                <p className="px-6 text-xs text-slate-600 italic">No recent prompts</p>
                             )}
                         </div>
                     </div>
                 </div>
 
-                {/* Bottom: User Profile */}
-                <div className="p-4 border-t border-white/5 bg-slate-950/20">
+                {/* Footer: User Profile */}
+                <div className="p-4 border-t border-white/5 bg-slate-950">
                     <div className="flex items-center gap-3 p-2">
                         <div className="h-9 w-9 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center overflow-hidden">
                             {currentUser?.photoURL ? (
@@ -175,17 +178,17 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 </div>
             </aside>
 
-            {/* Main Content (Center) */}
+            {/* Center Panel (Canvas) */}
             <main className="flex-1 flex flex-col relative min-w-0">
-                <div className="flex-1 overflow-y-auto p-8 scrollbar-hide bg-slate-950/50">
+                <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide bg-slate-950">
                     <div className="max-w-4xl mx-auto w-full">
                         {children}
                     </div>
                 </div>
             </main>
 
-            {/* Preview Panel (Right) */}
-            <aside className="w-96 flex-shrink-0 border-l border-white/5 bg-slate-900/50 backdrop-blur-xl flex flex-col hidden lg:flex">
+            {/* Right Panel (Preview) */}
+            <aside className="w-[400px] flex-shrink-0 flex flex-col border-l border-white/5 bg-slate-900/30 backdrop-blur-md hidden lg:flex">
                 {rightPanel}
             </aside>
         </div>

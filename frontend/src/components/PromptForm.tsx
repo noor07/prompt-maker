@@ -89,7 +89,7 @@ export const PromptForm: React.FC<PromptFormProps> = ({
                             value={keywords}
                             onChange={(e) => setKeywords(e.target.value)}
                             placeholder="Describe your prompt requirements..."
-                            className="w-full min-h-[250px] bg-slate-900 border border-slate-800 rounded-2xl p-6 text-slate-200 font-mono text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all placeholder:text-slate-600 leading-relaxed resize-none shadow-2xl"
+                            className="w-full min-h-[250px] bg-slate-900/50 border border-white/10 rounded-2xl p-6 text-slate-200 font-mono text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all placeholder:text-slate-600 leading-relaxed resize-none shadow-2xl"
                         />
 
                         {/* Settings Bar (Pills) */}

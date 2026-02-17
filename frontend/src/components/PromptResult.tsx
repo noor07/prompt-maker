@@ -37,10 +37,10 @@ export const PromptResult: React.FC<PromptResultProps> = ({ prompt, onSave, isSa
     };
 
     return (
-        <div className="h-full flex flex-col p-6 overflow-hidden bg-slate-900/50 backdrop-blur-xl">
-            {/* Action Header */}
-            <div className="flex items-center justify-between mb-6 flex-shrink-0">
-                <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] px-1">Output Preview</h3>
+        <div className="h-full flex flex-col overflow-hidden">
+            {/* Fixed Header */}
+            <div className="h-16 flex-shrink-0 flex items-center justify-between px-6 border-b border-white/5">
+                <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">Output Preview</h3>
                 <div className="flex items-center gap-1.5">
                     <button
                         onClick={handleCopy}
@@ -73,8 +73,8 @@ export const PromptResult: React.FC<PromptResultProps> = ({ prompt, onSave, isSa
                 </div>
             </div>
 
-            {/* Content Area */}
-            <div className="flex-1 min-h-0 flex flex-col">
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto p-6 font-mono text-sm text-slate-300">
                 <AnimatePresence mode="wait">
                     {isLoading ? (
                         <motion.div
@@ -82,10 +82,10 @@ export const PromptResult: React.FC<PromptResultProps> = ({ prompt, onSave, isSa
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="flex-1 space-y-4"
+                            className="space-y-4"
                         >
                             <div className="h-4 w-1/2 bg-slate-800 animate-pulse rounded-full" />
-                            <div className="flex-1 space-y-3 bg-[#0d1117] rounded-xl p-6 border border-white/5">
+                            <div className="space-y-3 bg-[#0d1117] rounded-xl p-6 border border-white/5">
                                 {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
                                     <div key={i} className="h-2 w-full bg-slate-800/50 rounded animate-pulse" style={{ opacity: 1 - i * 0.1 }} />
                                 ))}
@@ -96,14 +96,14 @@ export const PromptResult: React.FC<PromptResultProps> = ({ prompt, onSave, isSa
                             key="result"
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="flex-1 flex flex-col min-h-0"
+                            className="space-y-4"
                         >
-                            <div className="flex-1 bg-[#0d1117] rounded-xl border border-white/5 overflow-hidden flex flex-col shadow-2xl">
+                            <div className="bg-[#0d1117] rounded-xl border border-white/5 overflow-hidden flex flex-col shadow-2xl">
                                 <div className="px-4 py-3 border-b border-white/5 flex items-center gap-2 bg-slate-950/50">
                                     <Terminal className="h-3.5 w-3.5 text-indigo-400" />
                                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">Prompt Output</span>
                                 </div>
-                                <div className="flex-1 overflow-auto p-6 font-mono text-sm leading-relaxed text-slate-300">
+                                <div className="p-6 leading-relaxed">
                                     <pre className="whitespace-pre-wrap selection:bg-indigo-500/30 selection:text-indigo-200">{prompt}</pre>
                                 </div>
                             </div>
@@ -113,7 +113,7 @@ export const PromptResult: React.FC<PromptResultProps> = ({ prompt, onSave, isSa
                             key="empty"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-6"
+                            className="h-full flex flex-col items-center justify-center text-center py-12 space-y-6"
                         >
                             <div className="relative">
                                 <div className="absolute inset-0 bg-indigo-500/10 blur-3xl rounded-full" />
@@ -123,7 +123,7 @@ export const PromptResult: React.FC<PromptResultProps> = ({ prompt, onSave, isSa
                             </div>
                             <div>
                                 <h4 className="text-white font-bold text-base mb-1">Ready to generate</h4>
-                                <p className="text-slate-500 text-xs leading-relaxed max-w-[180px]">
+                                <p className="text-slate-500 text-xs leading-relaxed max-w-[180px] mx-auto">
                                     Your professional prompt will appear here in real-time.
                                 </p>
                             </div>
