@@ -18,7 +18,7 @@ import { DashboardLayout } from './components/DashboardLayout';
 
 import axios from 'axios';
 
-const GEMINI_MODEL = "gemini-2.0-flash-lite-preview-02-05";
+const GEMINI_MODEL = "gemini-2.5-flash-lite";
 
 function PromptGenerator() {
   const [keywords, setKeywords] = useState('');
