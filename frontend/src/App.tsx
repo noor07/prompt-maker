@@ -16,13 +16,13 @@ import { auth } from './firebase';
 import api from './services/api';
 import { DashboardLayout } from './components/DashboardLayout';
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import axios from 'axios';
 
-const GEMINI_MODEL = "gemini-1.5-flash-lite-preview-0514";
+const GEMINI_MODEL = "gemini-2.0-flash-lite-preview-02-05";
 
 function PromptGenerator() {
   const [keywords, setKeywords] = useState('');
-  const [taskType, setTaskType] = useState('writing'); // Default to Writing as requested
+  const [taskType, setTaskType] = useState('writing');
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -58,29 +58,17 @@ function PromptGenerator() {
     setGeneratedPrompt('');
 
     try {
-      // 1. Initialize Gemini
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!apiKey) throw new Error("API Key missing (VITE_GEMINI_API_KEY)");
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/generate`, {
+        keywords,
+        taskType
+      });
 
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
-
-      // 2. Construct Prompt with Mode Context
-      const promptContext = `You are an expert prompt engineer. Generate a high-quality, professional prompt for the following task.
-      
-      Topic: ${keywords}
-      Mode: ${taskType}
-      
-      The output should be optimized for a Large Language Model. Return ONLY the generated prompt text. No explanations.`;
-
-      const result = await model.generateContent(promptContext);
-      const response = await result.response;
-      const text = response.text();
-
-      setGeneratedPrompt(text.trim());
+      setGeneratedPrompt(response.data.prompt);
     } catch (err: any) {
       console.error('Error generating prompt:', err);
-      setError(err.message || 'Failed to generate prompt. Please try again.');
+      setError(
+        err.response?.data?.error || 'Failed to generate prompt. Please try again.'
+      );
     } finally {
       setIsLoading(false);
     }
