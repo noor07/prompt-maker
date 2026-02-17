@@ -35,7 +35,7 @@ export class GeminiService {
         const prompt = PROMPT_TEMPLATE
             .replace('{keywords}', data.keywords)
             .replace('{taskType}', data.taskType)
-            .replace('{platform}', data.platform);
+            .replace('{platform}', data.platform || 'Gemini');
 
         try {
             const result = await model.generateContent(prompt);

@@ -116,12 +116,18 @@ app.post('/generate', async (req: Request, res: Response) => {
         }
 
         console.log("[Generate] Body received:", bodyData);
-        const { prompt: promptText, mode, platform } = bodyData;
-        console.log(`[Generate] Extracted - prompt: ${!!promptText}, mode: ${!!mode}, platform: ${!!platform}`);
 
-        if (!promptText || !mode || !platform) {
-            console.error("[Generate] Missing fields check failed. Body keys:", Object.keys(bodyData || {}));
-            res.status(400).json({ error: "Missing required fields: prompt, mode, platform" });
+        // Hybrid Schema Support (Backwards Compatibility)
+        const promptText = bodyData.prompt || bodyData.keywords;
+        const mode = bodyData.mode || bodyData.taskType;
+        // Default to 'Gemini' if platform is missing (legacy frontend)
+        const platform = bodyData.platform || bodyData.targetPlatform || 'Gemini';
+
+        console.log(`[Generate] Resolved - prompt: ${!!promptText}, mode: ${!!mode}, platform: ${platform}`);
+
+        if (!promptText || !mode) {
+            console.error("[Generate] Missing required fields. Body keys:", Object.keys(bodyData || {}));
+            res.status(400).json({ error: "Missing required fields: prompt/keywords, mode/taskType" });
             return;
         }
 
