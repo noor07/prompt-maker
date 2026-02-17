@@ -36,7 +36,7 @@ function cn(...inputs: ClassValue[]) {
 const Navbar = ({ activeTab, setActiveTab, isMobileMenuOpen, setIsMobileMenuOpen }: any) => {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
-    const isAuthView = activeTab === 'login' || activeTab === 'signup' || activeTab === 'forgot-password' || activeTab === 'features';
+    const isAuthView = activeTab === 'login' || activeTab === 'signup' || activeTab === 'forgot-password';
 
     const navItems = [
         { id: 'home', label: 'Home' },
@@ -764,7 +764,7 @@ const ModernApp = ({ initialTab = 'home' }: { initialTab?: string }) => {
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-indigo-500/30">
-            {activeTab !== 'login' && activeTab !== 'signup' && activeTab !== 'forgot-password' && activeTab !== 'features' && (
+            {activeTab !== 'login' && activeTab !== 'signup' && activeTab !== 'forgot-password' && (
                 <Navbar
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
@@ -877,7 +877,7 @@ const ModernApp = ({ initialTab = 'home' }: { initialTab?: string }) => {
                 </AnimatePresence>
             </main>
 
-            {(activeTab !== 'login' && activeTab !== 'signup' && activeTab !== 'forgot-password' && activeTab !== 'features') && <MegaFooter />}
+            {(activeTab !== 'login' && activeTab !== 'signup' && activeTab !== 'forgot-password') && <MegaFooter />}
         </div>
     );
 }
