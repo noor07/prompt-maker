@@ -115,9 +115,12 @@ app.post('/generate', async (req: Request, res: Response) => {
             }
         }
 
+        console.log("[Generate] Body received:", bodyData);
         const { prompt: promptText, mode, platform } = bodyData;
+        console.log(`[Generate] Extracted - prompt: ${!!promptText}, mode: ${!!mode}, platform: ${!!platform}`);
 
         if (!promptText || !mode || !platform) {
+            console.error("[Generate] Missing fields check failed. Body keys:", Object.keys(bodyData || {}));
             res.status(400).json({ error: "Missing required fields: prompt, mode, platform" });
             return;
         }
