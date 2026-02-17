@@ -262,7 +262,10 @@ const ProblemSolution = () => (
                             "Vague instructions leading to generic output",
                             "Endless trial-and-error loops",
                             "Wasted API tokens and costs",
-                            "Frustration and inconsistent results"
+                            "Frustration and inconsistent results",
+                            "Frequent hallucinations and made-up facts",
+                            "Messy, unstructured text dumps",
+                            "Manual rewriting for every new task"
                         ].map((item, i) => (
                             <li key={i} className="flex items-start gap-3 text-slate-400">
                                 <X className="h-5 w-5 text-red-500/50 mt-0.5 shrink-0" />
@@ -291,7 +294,10 @@ const ProblemSolution = () => (
                             "Structured frameworks (CO-STAR, RTF)",
                             "Perfect 1st shot results",
                             "Optimized token usage",
-                            "Predictable, high-quality outputs"
+                            "Predictable, high-quality outputs",
+                            "Context-anchored accuracy",
+                            "Clean formats (JSON, Markdown, Code)",
+                            "Reusable templates & variables"
                         ].map((item, i) => (
                             <li key={i} className="flex items-start gap-3 text-slate-300">
                                 <Check className="h-5 w-5 text-indigo-400 mt-0.5 shrink-0" />
@@ -709,18 +715,38 @@ const MegaFooter = () => {
                         </div>
                     </div>
 
-                    {['Product', 'Company', 'Resources'].map((col) => (
-                        <div key={col}>
-                            <h4 className="font-semibold text-white mb-6">{col}</h4>
-                            <ul className="space-y-4 text-sm text-slate-400">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <li key={i} className="hover:text-indigo-400 cursor-pointer transition-colors">
-                                        Link Item {i}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    ))}
+                    {/* Product Column */}
+                    <div>
+                        <h4 className="font-semibold text-white mb-6">Product</h4>
+                        <ul className="space-y-4 text-sm text-slate-400">
+                            <li><a href="#features" className="hover:text-indigo-400 transition-colors">Features</a></li>
+                            <li><a href="#pricing" className="hover:text-indigo-400 transition-colors">Pricing</a></li>
+                            <li><a href="#" className="hover:text-indigo-400 transition-colors">Integrations</a></li>
+                            <li><a href="#" className="hover:text-indigo-400 transition-colors">Changelog</a></li>
+                        </ul>
+                    </div>
+
+                    {/* Company Column */}
+                    <div>
+                        <h4 className="font-semibold text-white mb-6">Company</h4>
+                        <ul className="space-y-4 text-sm text-slate-400">
+                            <li><a href="#" className="hover:text-indigo-400 transition-colors">About Us</a></li>
+                            <li><a href="#" className="hover:text-indigo-400 transition-colors">Careers</a></li>
+                            <li><a href="#" className="hover:text-indigo-400 transition-colors">Privacy Policy</a></li>
+                            <li><a href="#" className="hover:text-indigo-400 transition-colors">Terms of Service</a></li>
+                        </ul>
+                    </div>
+
+                    {/* Resources Column */}
+                    <div>
+                        <h4 className="font-semibold text-white mb-6">Resources</h4>
+                        <ul className="space-y-4 text-sm text-slate-400">
+                            <li><a href="#" className="hover:text-indigo-400 transition-colors">Documentation</a></li>
+                            <li><a href="#" className="hover:text-indigo-400 transition-colors">Prompt Library</a></li>
+                            <li><a href="#" className="hover:text-indigo-400 transition-colors">Blog</a></li>
+                            <li><a href="#" className="hover:text-indigo-400 transition-colors">Community</a></li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div className="mt-12 text-center text-xs text-slate-600">
