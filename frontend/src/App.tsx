@@ -16,7 +16,6 @@ import { auth } from './firebase';
 import api from './services/api';
 import { DashboardLayout } from './components/DashboardLayout';
 
-import axios from 'axios';
 
 const GEMINI_MODEL = "gemini-2.5-flash-lite";
 
@@ -37,8 +36,8 @@ function PromptGenerator() {
 
   const fetchRecentPrompts = async () => {
     try {
-      const response = await api.get('/history');
-      setRecentPrompts(response.data.history || []);
+      const response = await api.get('/get-prompts');
+      setRecentPrompts(response.data.prompts || []);
     } catch (err) {
       console.error('Error fetching history:', err);
     }
@@ -58,7 +57,7 @@ function PromptGenerator() {
     setGeneratedPrompt('');
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/generate`, {
+      const response = await api.post('/generate', {
         keywords,
         taskType
       });
