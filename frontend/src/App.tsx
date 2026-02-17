@@ -59,8 +59,8 @@ function PromptGenerator() {
 
     try {
       const response = await api.post('/generate', {
-        keywords,
-        taskType,
+        prompt: keywords,
+        mode: taskType,
         platform: targetPlatform
       });
 
