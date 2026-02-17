@@ -15,9 +15,6 @@ import {
     BarChart3,
     Mail,
     Image as ImageIcon,
-    Cpu,
-    Globe,
-    Layers,
     MessageSquare,
     Code,
     Mic,
@@ -155,13 +152,13 @@ export const PromptForm: React.FC<PromptFormProps> = ({
 
     // Find active platform across categories
     let activePlatform = { value: 'ChatGPT', label: 'ChatGPT', icon: MessageSquare }; // Default
-    let activeCategoryIcon = MessageSquare;
+    let ActiveCategoryIcon = MessageSquare;
 
     for (const category of PLATFORM_CATEGORIES) {
         const found = category.options.find(p => p.value === targetPlatform);
         if (found) {
             activePlatform = { ...found, icon: category.icon };
-            activeCategoryIcon = category.icon;
+            ActiveCategoryIcon = category.icon;
             break;
         }
     }
@@ -253,7 +250,7 @@ export const PromptForm: React.FC<PromptFormProps> = ({
                                         }}
                                         className="flex items-center gap-2.5 px-4 py-2 bg-slate-800 border border-white/10 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-700 hover:border-white/20 hover:border-indigo-500/50 transition-all shadow-xl backdrop-blur-md h-10"
                                     >
-                                        <activeCategoryIcon className="h-4 w-4 text-indigo-400" />
+                                        <ActiveCategoryIcon className="h-4 w-4 text-indigo-400" />
                                         <span className="hidden sm:inline">Platform:</span> {activePlatform.label}
                                         <ChevronDown className={cn("h-4 w-4 text-slate-500 transition-transform duration-300", isPlatformOpen && "rotate-180")} />
                                     </button>
