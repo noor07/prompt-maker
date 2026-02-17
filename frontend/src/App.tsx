@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
@@ -24,9 +24,31 @@ function PromptGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tone, setTone] = useState('professional');
+  const [recentPrompts, setRecentPrompts] = useState<any[]>([]);
   const [activeNav, setActiveNav] = useState('new');
   const [model, setModel] = useState('gpt4');
   const { currentUser } = useAuth();
+
+  useEffect(() => {
+    fetchRecentPrompts();
+  }, []);
+
+  const fetchRecentPrompts = async () => {
+    try {
+      const response = await api.get('/history');
+      setRecentPrompts(response.data.history || []);
+    } catch (err) {
+      console.error('Error fetching history:', err);
+    }
+  };
+
+  const handleNewChat = () => {
+    setKeywords('');
+    setGeneratedPrompt('');
+    setError(null);
+    setActiveNav('new');
+  };
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +61,8 @@ function PromptGenerator() {
         keywords,
         taskType,
         targetPlatform,
+        tone,
+        model
       });
 
       setGeneratedPrompt(response.data.prompt);
@@ -60,8 +84,11 @@ function PromptGenerator() {
         keywords,
         taskType,
         targetPlatform,
+        tone,
+        model,
         generatedPrompt
       });
+      fetchRecentPrompts();
       alert('Prompt saved successfully!');
     } catch (err) {
       console.error('Error saving prompt:', err);
@@ -76,6 +103,8 @@ function PromptGenerator() {
     <DashboardLayout
       activeNav={activeNav}
       setActiveNav={setActiveNav}
+      recentPrompts={recentPrompts}
+      onNewChat={handleNewChat}
       rightPanel={
         <PromptResult
           prompt={generatedPrompt}
@@ -93,6 +122,8 @@ function PromptGenerator() {
           setTaskType={setTaskType}
           targetPlatform={targetPlatform}
           setTargetPlatform={setTargetPlatform}
+          tone={tone}
+          setTone={setTone}
           onSubmit={handleGenerate}
           isLoading={isLoading}
           model={model}
