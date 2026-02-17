@@ -22,6 +22,7 @@ const GEMINI_MODEL = "gemini-2.5-flash-lite";
 function PromptGenerator() {
   const [keywords, setKeywords] = useState('');
   const [taskType, setTaskType] = useState('writing');
+  const [targetPlatform, setTargetPlatform] = useState('ChatGPT');
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -59,7 +60,8 @@ function PromptGenerator() {
     try {
       const response = await api.post('/generate', {
         keywords,
-        taskType
+        taskType,
+        platform: targetPlatform
       });
 
       setGeneratedPrompt(response.data.prompt);
@@ -126,6 +128,8 @@ function PromptGenerator() {
           setKeywords={setKeywords}
           taskType={taskType}
           setTaskType={setTaskType}
+          targetPlatform={targetPlatform}
+          setTargetPlatform={setTargetPlatform}
           onSubmit={handleGenerate}
           isLoading={isLoading}
         />
