@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
-import './App.css';
 import { PromptForm } from './components/PromptForm';
 import { PromptResult } from './components/PromptResult';
 import { Dashboard } from './components/Dashboard';
@@ -14,6 +14,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { signOut } from 'firebase/auth';
 import { auth } from './firebase';
 import api from './services/api';
+import { DashboardLayout } from './components/DashboardLayout';
 
 function PromptGenerator() {
   const [keywords, setKeywords] = useState('');
@@ -23,6 +24,8 @@ function PromptGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeNav, setActiveNav] = useState('new');
+  const [model, setModel] = useState('gpt4');
   const { currentUser } = useAuth();
 
   const handleGenerate = async (e: React.FormEvent) => {
@@ -68,31 +71,21 @@ function PromptGenerator() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error("Failed to log out", error);
-    }
-  };
 
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <div className="header-content">
-          <h1>Prompt Maker</h1>
-          <nav>
-            <Link to="/app" className="nav-link">Generator</Link>
-            <Link to="/dashboard" className="nav-link">My Prompts</Link>
-          </nav>
-        </div>
-        <div className="user-info">
-          <span>{currentUser?.email}</span>
-          <button onClick={handleLogout} className="btn-secondary">Log Out</button>
-        </div>
-      </header>
-
-      <main className="app-main">
+    <DashboardLayout
+      activeNav={activeNav}
+      setActiveNav={setActiveNav}
+      rightPanel={
+        <PromptResult
+          prompt={generatedPrompt}
+          isLoading={isLoading}
+          onSave={currentUser ? handleSavePrompt : undefined}
+          isSaving={isSaving}
+        />
+      }
+    >
+      {activeNav === 'new' && (
         <PromptForm
           keywords={keywords}
           setKeywords={setKeywords}
@@ -102,17 +95,36 @@ function PromptGenerator() {
           setTargetPlatform={setTargetPlatform}
           onSubmit={handleGenerate}
           isLoading={isLoading}
+          model={model}
+          setModel={setModel}
         />
+      )}
+      {activeNav === 'history' && (
+        <div className="p-8">
+          <Dashboard />
+        </div>
+      )}
+      {activeNav === 'templates' && (
+        <div className="h-full flex items-center justify-center text-slate-500">
+          Templates feature coming soon
+        </div>
+      )}
+      {activeNav === 'settings' && (
+        <div className="h-full flex items-center justify-center text-slate-500">
+          Settings feature coming soon
+        </div>
+      )}
 
-        {error && <div className="error-message">{error}</div>}
-
-        <PromptResult
-          prompt={generatedPrompt}
-          onSave={currentUser ? handleSavePrompt : undefined}
-          isSaving={isSaving}
-        />
-      </main>
-    </div>
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm font-medium backdrop-blur-xl z-50"
+        >
+          {error}
+        </motion.div>
+      )}
+    </DashboardLayout>
   );
 }
 
