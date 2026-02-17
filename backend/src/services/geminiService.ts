@@ -10,22 +10,21 @@ if (!API_KEY) {
 }
 
 const genAI = new GoogleGenerativeAI(API_KEY || '');
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
 interface GeneratePromptRequest {
     keywords: string;
     taskType: string;
-    targetPlatform: string;
+    platform: string;
 }
 
-const PROMPT_TEMPLATE = `You are an expert prompt engineer. Your task is to clearer, more specific, and more effective prompt based on the user's input.
+const PROMPT_TEMPLATE = `You are an expert prompt engineer. Generate a high-quality, professional prompt for the following task.
+      
+Topic: {keywords}
+Mode: {taskType}
+Target Platform: {platform}
 
-Input details:
-- Keywords/Topic: {keywords}
-- Task Type: {taskType}
-- Target Platform: {targetPlatform}
-
-Generate a single, high-quality prompt that I can copy and paste to use for the above task. The prompt should be optimized for an LLM (Large Language Model). Return ONLY the generated prompt text, nothing else.`;
+The output should be optimized for a Large Language Model. Return ONLY the generated prompt text. No explanations.`;
 
 export class GeminiService {
     async generatePrompt(data: GeneratePromptRequest): Promise<string> {
@@ -36,7 +35,7 @@ export class GeminiService {
         const prompt = PROMPT_TEMPLATE
             .replace('{keywords}', data.keywords)
             .replace('{taskType}', data.taskType)
-            .replace('{targetPlatform}', data.targetPlatform);
+            .replace('{platform}', data.platform);
 
         try {
             const result = await model.generateContent(prompt);

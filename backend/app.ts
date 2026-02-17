@@ -115,14 +115,18 @@ app.post('/generate', async (req: Request, res: Response) => {
             }
         }
 
-        const { keywords, taskType, targetPlatform } = bodyData;
+        const { prompt: promptText, mode, platform } = bodyData;
 
-        if (!keywords || !taskType || !targetPlatform) {
-            res.status(400).json({ error: "Missing required fields: keywords, taskType, targetPlatform" });
+        if (!promptText || !mode || !platform) {
+            res.status(400).json({ error: "Missing required fields: prompt, mode, platform" });
             return;
         }
 
-        const prompt = await geminiService.generatePrompt({ keywords, taskType, targetPlatform });
+        const prompt = await geminiService.generatePrompt({
+            keywords: promptText,
+            taskType: mode,
+            platform
+        });
         res.json({ prompt });
     } catch (error: any) {
         console.error("Error in /generate:", error);
