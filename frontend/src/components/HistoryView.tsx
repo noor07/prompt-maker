@@ -32,7 +32,7 @@ const MOCK_HISTORY: HistoryItem[] = [
         prompt: "Create a detailed 10-minute video script focusing on the historical evolution of artificial intelligence. Start from Alan Turing's conceptual work and move through the first AI winter, the rise of expert systems, and finally the current generative AI explosion. Tone should be educational yet engaging for a general tech audience.",
         platform: "Gemini",
         type: "writing",
-        model: "claude",
+        model: "gemini-flash",
         tone: "creative"
     },
     {
@@ -41,7 +41,7 @@ const MOCK_HISTORY: HistoryItem[] = [
         prompt: "Write a custom React hook called `useAuth` that integrates with Firebase Auth. It should handle login, signup, and persistent state using the `onAuthStateChanged` listener. Include TypeScript types and ensure the hook provides a `loading` state to prevent UI flickering during initial mount.",
         platform: "VS Code",
         type: "coding",
-        model: "gpt4",
+        model: "gemini-flash",
         tone: "professional"
     },
     {
@@ -50,7 +50,7 @@ const MOCK_HISTORY: HistoryItem[] = [
         prompt: "Analyze a CSV dataset containing monthly sales data. The script should calculate the MoM growth, identify the top 3 performing regions, and generate a matplotlib visualization for sales trends. Ensure the code handles missing values by interpolating based on previous month's data.",
         platform: "Jupyter",
         type: "analysis",
-        model: "gpt4",
+        model: "gemini-flash",
         tone: "academic"
     },
     {
@@ -59,7 +59,7 @@ const MOCK_HISTORY: HistoryItem[] = [
         prompt: "Develop a comprehensive brand voice guide for a new luxury skincare line called 'Aether'. The voice should be minimalist, sophisticated, and science-backed. Include examples of social media copy, product descriptions, and email marketing subject lines.",
         platform: "Notion",
         type: "writing",
-        model: "claude",
+        model: "gemini-flash",
         tone: "creative"
     }
 ];

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { motion } from 'framer-motion';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { PromptForm } from './components/PromptForm';
@@ -17,18 +16,19 @@ import { auth } from './firebase';
 import api from './services/api';
 import { DashboardLayout } from './components/DashboardLayout';
 
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+const GEMINI_MODEL = "gemini-1.5-flash-lite-preview-0514";
+
 function PromptGenerator() {
   const [keywords, setKeywords] = useState('');
-  const [taskType, setTaskType] = useState('coding');
-  const [targetPlatform, setTargetPlatform] = useState('vscode');
+  const [taskType, setTaskType] = useState('writing'); // Default to Writing as requested
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [tone, setTone] = useState('professional');
   const [recentPrompts, setRecentPrompts] = useState<any[]>([]);
   const [activeNav, setActiveNav] = useState('new');
-  const [model, setModel] = useState('gpt4');
   const { currentUser } = useAuth();
 
   useEffect(() => {
@@ -58,20 +58,29 @@ function PromptGenerator() {
     setGeneratedPrompt('');
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/generate`, {
-        keywords,
-        taskType,
-        targetPlatform,
-        tone,
-        model
-      });
+      // 1. Initialize Gemini
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      if (!apiKey) throw new Error("API Key missing (VITE_GEMINI_API_KEY)");
 
-      setGeneratedPrompt(response.data.prompt);
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+
+      // 2. Construct Prompt with Mode Context
+      const promptContext = `You are an expert prompt engineer. Generate a high-quality, professional prompt for the following task.
+      
+      Topic: ${keywords}
+      Mode: ${taskType}
+      
+      The output should be optimized for a Large Language Model. Return ONLY the generated prompt text. No explanations.`;
+
+      const result = await model.generateContent(promptContext);
+      const response = await result.response;
+      const text = response.text();
+
+      setGeneratedPrompt(text.trim());
     } catch (err: any) {
       console.error('Error generating prompt:', err);
-      setError(
-        err.response?.data?.error || 'Failed to generate prompt. Please try again.'
-      );
+      setError(err.message || 'Failed to generate prompt. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -84,16 +93,14 @@ function PromptGenerator() {
       await api.post('/save-prompt', {
         keywords,
         taskType,
-        targetPlatform,
-        tone,
-        model,
+        targetPlatform: 'Generic', // Simplified
+        tone: 'Professional', // Simplified
+        model: GEMINI_MODEL,
         generatedPrompt
       });
       fetchRecentPrompts();
-      alert('Prompt saved successfully!');
     } catch (err) {
       console.error('Error saving prompt:', err);
-      alert('Failed to save prompt.');
     } finally {
       setIsSaving(false);
     }
@@ -101,11 +108,9 @@ function PromptGenerator() {
 
   const handleLoadLibraryItem = (item: any) => {
     setKeywords(item.prompt);
-    setTaskType(item.type);
-    setModel(item.model);
-    setTone(item.tone);
-    setGeneratedPrompt(''); // Clear result when loading old prompt
-    setActiveNav('new'); // Switch to editor
+    setTaskType(item.type || 'writing');
+    setGeneratedPrompt('');
+    setActiveNav('new');
   };
 
   const handleDeleteLibraryItem = (id: string) => {
@@ -134,14 +139,8 @@ function PromptGenerator() {
           setKeywords={setKeywords}
           taskType={taskType}
           setTaskType={setTaskType}
-          targetPlatform={targetPlatform}
-          setTargetPlatform={setTargetPlatform}
-          tone={tone}
-          setTone={setTone}
           onSubmit={handleGenerate}
           isLoading={isLoading}
-          model={model}
-          setModel={setModel}
         />
       )}
       {activeNav === 'history' && (
