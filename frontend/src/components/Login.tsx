@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth';
 import { auth } from '../firebase';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Mail, Lock } from 'lucide-react';
 import { AuthLayout } from './AuthLayout';
 
@@ -9,9 +9,10 @@ interface LoginProps {
     isInternal?: boolean;
     onBack?: () => void;
     onSwitchToSignup?: () => void;
+    onForgotPassword?: () => void;
 }
 
-export const Login: React.FC<LoginProps> = ({ onBack, onSwitchToSignup }) => {
+export const Login: React.FC<LoginProps> = ({ onBack, onSwitchToSignup, onForgotPassword }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -106,7 +107,13 @@ export const Login: React.FC<LoginProps> = ({ onBack, onSwitchToSignup }) => {
                     <div className="space-y-2">
                         <div className="flex justify-between items-center ml-1">
                             <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Password</label>
-                            <Link to="/forgot-password" title="Coming soon!" className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors">Forgot?</Link>
+                            <button
+                                type="button"
+                                onClick={onForgotPassword}
+                                className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
+                            >
+                                Forgot?
+                            </button>
                         </div>
                         <div className="relative group">
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />

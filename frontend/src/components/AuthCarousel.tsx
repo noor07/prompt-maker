@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal, Code, Zap, Image, Globe, Cpu, Layers, Sparkles } from 'lucide-react';
+import { Code, Zap, Image, Globe, Cpu, Layers, Sparkles } from 'lucide-react';
 
 // --- Sub-Component: Slide 1 "The Architect" ---
 const ArchitectSlide = () => {

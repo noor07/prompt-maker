@@ -125,6 +125,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<ModernApp initialTab="login" />} />
           <Route path="/signup" element={<ModernApp initialTab="signup" />} />
+          <Route path="/forgot-password" element={<ModernApp initialTab="forgot-password" />} />
 
           <Route
             path="/app"

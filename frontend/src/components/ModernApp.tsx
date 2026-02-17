@@ -23,6 +23,7 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { Login } from './Login';
 import { SignUp } from './SignUp';
+import { ForgotPassword } from './ForgotPassword';
 
 // --- Utility ---
 function cn(...inputs: ClassValue[]) {
@@ -34,7 +35,7 @@ function cn(...inputs: ClassValue[]) {
 const Navbar = ({ activeTab, setActiveTab, isMobileMenuOpen, setIsMobileMenuOpen }: any) => {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
-    const isAuthView = activeTab === 'login' || activeTab === 'signup';
+    const isAuthView = activeTab === 'login' || activeTab === 'signup' || activeTab === 'forgot-password';
 
     const navItems = [
         { id: 'home', label: 'Home' },
@@ -736,7 +737,7 @@ const ModernApp = ({ initialTab = 'home' }: { initialTab?: string }) => {
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-indigo-500/30">
-            {activeTab !== 'login' && activeTab !== 'signup' && (
+            {activeTab !== 'login' && activeTab !== 'signup' && activeTab !== 'forgot-password' && (
                 <Navbar
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
@@ -803,6 +804,7 @@ const ModernApp = ({ initialTab = 'home' }: { initialTab?: string }) => {
                                 isInternal
                                 onBack={() => setActiveTab('home')}
                                 onSwitchToSignup={() => setActiveTab('signup')}
+                                onForgotPassword={() => setActiveTab('forgot-password')}
                             />
                         </motion.div>
                     )}
@@ -821,10 +823,23 @@ const ModernApp = ({ initialTab = 'home' }: { initialTab?: string }) => {
                             />
                         </motion.div>
                     )}
+                    {activeTab === 'forgot-password' && (
+                        <motion.div
+                            key="forgot-password"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <ForgotPassword
+                                onBack={() => setActiveTab('login')}
+                            />
+                        </motion.div>
+                    )}
                 </AnimatePresence>
             </main>
 
-            {(activeTab !== 'login' && activeTab !== 'signup') && <MegaFooter />}
+            {(activeTab !== 'login' && activeTab !== 'signup' && activeTab !== 'forgot-password') && <MegaFooter />}
         </div>
     );
 }
