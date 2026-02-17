@@ -11,7 +11,7 @@ async function run() {
         const prompt = await service.generatePrompt({
             keywords: "code review",
             taskType: "coding",
-            targetPlatform: "github"
+            platform: "github"
         });
         console.log("Generated Prompt:", prompt);
     } catch (error) {
