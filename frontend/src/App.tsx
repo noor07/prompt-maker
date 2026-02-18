@@ -75,6 +75,13 @@ function PromptGenerator() {
     }
   };
 
+  // Auto-save effect when a new prompt is generated successfully
+  useEffect(() => {
+    if (generatedPrompt && currentUser && !isLoading) {
+      handleSavePrompt();
+    }
+  }, [generatedPrompt]);
+
   const handleSavePrompt = async () => {
     if (!currentUser) return;
     setIsSaving(true);
@@ -148,6 +155,7 @@ function PromptGenerator() {
         </div>
       ) : activeNav === 'history' ? (
         <HistoryView
+          prompts={recentPrompts}
           onLoadToEditor={handleLoadLibraryItem}
           onDelete={handleDeleteLibraryItem}
         />
