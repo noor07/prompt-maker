@@ -25,8 +25,8 @@ if (!API_KEY) {
 }
 
 const genAI = new GoogleGenerativeAI(API_KEY || "dummy_key");
-// Switched to stable model to avoid 500 errors
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+// Switched to gemini-pro (legacy stable) as 1.5-flash returned 404
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 export class GeminiService {
     async generatePrompt(data: { keywords: string, taskType: string, platform?: string }): Promise<string> {
