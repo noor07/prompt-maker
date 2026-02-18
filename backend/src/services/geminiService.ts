@@ -9,10 +9,19 @@ const envPath = require('path').resolve(__dirname, '../../.env');
 dotenv.config({ path: envPath });
 
 
-const API_KEY = process.env.GEMINI_API_KEY;
+import { ENV_SECRETS } from '../config/envSecrets';
+
+const FALLBACK_KEY = "AIzaSyClJkefcaHzm8rR2EhONZx-SfBI188WjL0";
+const ENV_KEY = ENV_SECRETS ? ENV_SECRETS.GEMINI_API_KEY : undefined;
+const API_KEY = process.env.GEMINI_API_KEY || ENV_KEY || FALLBACK_KEY;
+
+console.log(`[GeminiService] Loading API Key...`);
+console.log(`[GeminiService] process.env.GEMINI_API_KEY exists: ${!!process.env.GEMINI_API_KEY}`);
+console.log(`[GeminiService] ENV_SECRETS.GEMINI_API_KEY exists: ${!!ENV_KEY}`);
+console.log(`[GeminiService] Using Key: ${API_KEY ? (API_KEY.substring(0, 5) + '...') : 'None'}`);
 
 if (!API_KEY) {
-    console.error("GEMINI_API_KEY is not set in environment variables.");
+    console.error("CRITICAL: GEMINI_API_KEY is completely missing.");
 }
 
 const genAI = new GoogleGenerativeAI(API_KEY || '');
