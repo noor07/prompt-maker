@@ -15,13 +15,14 @@ const app = express();
 const geminiService = new GeminiService();
 
 // Initialize Firebase Admin SDK
+import { ENV_SECRETS } from './src/config/envSecrets';
+
 try {
     let serviceAccount;
-    // Check if SERVICE_ACCOUNT_KEY env var exists (JSON string)
+    // 1. Try process.env.FIREBASE_SERVICE_ACCOUNT
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
         console.log("Found FIREBASE_SERVICE_ACCOUNT env var");
         try {
-            // Check if it's base64 encoded (starts with ey... and no braces at start)
             const envVar = process.env.FIREBASE_SERVICE_ACCOUNT.trim();
             if (!envVar.startsWith('{')) {
                 const decoded = Buffer.from(envVar, 'base64').toString('utf-8');
@@ -33,17 +34,35 @@ try {
         } catch (error) {
             console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT:", error);
         }
+    }
 
-    } else {
-        // Fallback to local file for development
+    // 2. Fallback to hardcoded secrets (chunked Base64)
+    if (!serviceAccount) {
+        console.log("Using hardcoded fallback secrets for Firebase");
+        if (ENV_SECRETS.FIREBASE_SERVICE_ACCOUNT_B64_CHUNKS) {
+            try {
+                const b64 = ENV_SECRETS.FIREBASE_SERVICE_ACCOUNT_B64_CHUNKS.join('');
+                const decoded = Buffer.from(b64, 'base64').toString('utf-8');
+                serviceAccount = JSON.parse(decoded);
+                console.log("Successfully loaded hardcoded chunked secrets");
+            } catch (e) {
+                console.error("Failed to decode chunked secrets", e);
+            }
+        }
+    }
+
+    // 3. Fallback to local file for development
+    if (!serviceAccount) {
         try {
             const keyPath = path.resolve(process.cwd(), 'serviceAccountKey.json');
             console.log("Attempting to load service account from:", keyPath);
             serviceAccount = require(keyPath);
             console.log("Successfully loaded serviceAccountKey.json");
         } catch (err) {
-            console.warn("Failed to load serviceAccountKey.json from", path.resolve(process.cwd(), 'serviceAccountKey.json'));
-            console.warn("Also tried:", path.resolve(__dirname, './serviceAccountKey.json'));
+            // Only warn if we are in development, otherwise silent
+            if (process.env.NODE_ENV !== 'production') {
+                console.warn("Failed to load local serviceAccountKey.json");
+            }
         }
     }
 
