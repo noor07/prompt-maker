@@ -113,39 +113,49 @@ function PromptGenerator() {
       setActiveNav={setActiveNav}
       recentPrompts={recentPrompts}
       onNewChat={handleNewChat}
-      rightPanel={
-        <PromptResult
-          prompt={generatedPrompt}
-          isLoading={isLoading}
-          onSave={currentUser ? handleSavePrompt : undefined}
-          isSaving={isSaving}
-        />
-      }
     >
-      {activeNav === 'new' && (
-        <PromptForm
-          keywords={keywords}
-          setKeywords={setKeywords}
-          taskType={taskType}
-          setTaskType={setTaskType}
-          targetPlatform={targetPlatform}
-          setTargetPlatform={setTargetPlatform}
-          onSubmit={handleGenerate}
-          isLoading={isLoading}
-        />
-      )}
-      {activeNav === 'history' && (
+      {activeNav === 'new' ? (
+        <div className="flex flex-col h-full relative">
+          {/* Scrollable Output Area */}
+          <div className="flex-1 overflow-hidden">
+            <div className="h-full overflow-y-auto pb-64 pt-8 px-4 scrollbar-hide">
+              <div className="max-w-3xl mx-auto">
+                <PromptResult
+                  prompt={generatedPrompt}
+                  isLoading={isLoading}
+                  onSave={currentUser ? handleSavePrompt : undefined}
+                  isSaving={isSaving}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Fixed Bottom Input Area */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-950 via-slate-950 to-transparent pt-12 pb-6 px-4 z-20">
+            <div className="max-w-3xl mx-auto w-full">
+              <PromptForm
+                keywords={keywords}
+                setKeywords={setKeywords}
+                taskType={taskType}
+                setTaskType={setTaskType}
+                targetPlatform={targetPlatform}
+                setTargetPlatform={setTargetPlatform}
+                onSubmit={handleGenerate}
+                isLoading={isLoading}
+              />
+            </div>
+          </div>
+        </div>
+      ) : activeNav === 'history' ? (
         <HistoryView
           onLoadToEditor={handleLoadLibraryItem}
           onDelete={handleDeleteLibraryItem}
         />
-      )}
-      {activeNav === 'templates' && (
+      ) : activeNav === 'templates' ? (
         <div className="h-full flex items-center justify-center text-slate-500">
           Templates feature coming soon
         </div>
-      )}
-      {activeNav === 'settings' && (
+      ) : (
         <div className="h-full flex items-center justify-center text-slate-500">
           Settings feature coming soon
         </div>

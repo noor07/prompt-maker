@@ -51,7 +51,6 @@ interface DashboardLayoutProps {
     children: React.ReactNode;
     activeNav: string;
     setActiveNav: (nav: string) => void;
-    rightPanel?: React.ReactNode;
     recentPrompts?: Array<{ id: string; keywords: string }>;
     onNewChat?: () => void;
 }
@@ -60,7 +59,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     children,
     activeNav,
     setActiveNav,
-    rightPanel,
     recentPrompts = [],
     onNewChat
 }) => {
@@ -180,17 +178,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
             {/* Center Panel (Canvas) */}
             <main className="flex-1 flex flex-col relative min-w-0">
-                <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide bg-slate-950">
-                    <div className="max-w-4xl mx-auto w-full">
-                        {children}
-                    </div>
+                <div className="flex-1 overflow-hidden bg-slate-950">
+                    {children}
                 </div>
             </main>
-
-            {/* Right Panel (Preview) */}
-            <aside className="w-[400px] flex-shrink-0 flex flex-col border-l border-white/5 bg-slate-900/30 backdrop-blur-md hidden lg:flex">
-                {rightPanel}
-            </aside>
         </div>
     );
 };
