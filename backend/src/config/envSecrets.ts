@@ -1,5 +1,5 @@
 export const ENV_SECRETS = {
-    GEMINI_API_KEY: "AIzaSyCKiBpZaYUv0Uq2GNJdgoMDD3EAWLMY9hY",
+    GEMINI_API_KEY: "AIzaSyC-AQnM7BI9vZcEz4l7G1fasBQ2bHeNFEw",
     // Split to avoid GitHub secret scanning
     FIREBASE_SERVICE_ACCOUNT_B64_CHUNKS: [
         "ewogICJ0eXBlIjogInNlcnZpY2VfYWNjb3VudCIsCiAgInByb2plY3RfaWQiOiAicHJvbXB0bWFrZXItNGJkMzciLAogICJwcml2YXRlX2tleV9pZCI6ICIzMTJiYjgyMH",
