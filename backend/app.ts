@@ -16,7 +16,20 @@ try {
     // Check if SERVICE_ACCOUNT_KEY env var exists (JSON string)
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
         console.log("Found FIREBASE_SERVICE_ACCOUNT env var");
-        serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+        try {
+            // Check if it's base64 encoded (starts with ey... and no braces at start)
+            const envVar = process.env.FIREBASE_SERVICE_ACCOUNT.trim();
+            if (!envVar.startsWith('{')) {
+                const decoded = Buffer.from(envVar, 'base64').toString('utf-8');
+                serviceAccount = JSON.parse(decoded);
+                console.log("Successfully decoded Base64 service account");
+            } else {
+                serviceAccount = JSON.parse(envVar);
+            }
+        } catch (error) {
+            console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT:", error);
+        }
+
     } else {
         // Fallback to local file for development
         try {
