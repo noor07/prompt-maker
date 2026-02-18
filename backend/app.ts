@@ -7,6 +7,10 @@ import cors from 'cors';
 
 dotenv.config();
 
+// Fallback: try loading from parent directory (useful when running from dist/)
+const envPath = path.resolve(__dirname, '../.env');
+dotenv.config({ path: envPath });
+
 const app = express();
 const geminiService = new GeminiService();
 

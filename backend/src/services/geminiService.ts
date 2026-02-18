@@ -2,6 +2,12 @@ import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
 import dotenv from 'dotenv';
 
 dotenv.config();
+// Fallback: try loading from parent directory (useful when running from dist/)
+// Need to go up from src/services -> src -> backend -> .env (3 levels up from __dirname if in src/services, or 2 levels up if in dist/services)
+// In dist: dist/services/geminiService.js -> dist/services -> dist -> backend root
+const envPath = require('path').resolve(__dirname, '../../.env');
+dotenv.config({ path: envPath });
+
 
 const API_KEY = process.env.GEMINI_API_KEY;
 
