@@ -185,7 +185,10 @@ app.post('/generate', async (req: Request, res: Response) => {
         res.json({ prompt });
     } catch (error: any) {
         console.error("Error in /generate:", error);
-        res.status(500).json({ error: error.message || "Internal Server Error" });
+        res.status(500).json({
+            error: error.message || "Internal Server Error",
+            details: error.stack // Temporary for debugging
+        });
     }
 });
 

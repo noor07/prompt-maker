@@ -24,42 +24,38 @@ if (!API_KEY) {
     console.error("CRITICAL: GEMINI_API_KEY is completely missing.");
 }
 
-const genAI = new GoogleGenerativeAI(API_KEY || '');
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
-
-interface GeneratePromptRequest {
-    keywords: string;
-    taskType: string;
-    platform: string;
-}
-
-const PROMPT_TEMPLATE = `You are an expert prompt engineer. Generate a high-quality, professional prompt for the following task.
-      
-Topic: {keywords}
-Mode: {taskType}
-Target Platform: {platform}
-
-The output should be optimized for a Large Language Model. Return ONLY the generated prompt text. No explanations.`;
+const genAI = new GoogleGenerativeAI(API_KEY || "dummy_key");
+// Switched to stable model to avoid 500 errors
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export class GeminiService {
-    async generatePrompt(data: GeneratePromptRequest): Promise<string> {
+    async generatePrompt(data: { keywords: string, taskType: string, platform?: string }): Promise<string> {
+        console.log(`[GeminiService] Request received: ${JSON.stringify(data)}`);
+
         if (!API_KEY) {
+            console.error("[GeminiService] API Key is missing!");
             throw new Error("Gemini API Key is missing.");
         }
 
-        const prompt = PROMPT_TEMPLATE
-            .replace('{keywords}', data.keywords)
-            .replace('{taskType}', data.taskType)
-            .replace('{platform}', data.platform || 'Gemini');
+        const prompt = `
+        You are an expert prompt engineer. Create a detailed prompt for ${data.platform || 'Gemini'} based on:
+        Keywords: ${data.keywords}
+        Task: ${data.taskType}
+        
+        Return ONLY the raw prompt text. No markdown, no explanations.
+        `;
 
         try {
+            console.log(`[GeminiService] Sending request to Gemini (Model: gemini-1.5-flash)...`);
             const result = await model.generateContent(prompt);
+            console.log(`[GeminiService] Response received.`);
             const response = await result.response;
             const text = response.text();
+            console.log(`[GeminiService] Text length: ${text.length}`);
             return text.trim();
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error generating content with Gemini:", error);
-            throw new Error("Failed to generate prompt.");
+            throw new Error(`Gemini Error: ${error.message} (Stack: ${error.stack})`);
         }
     }
 }
