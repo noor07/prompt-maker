@@ -265,16 +265,16 @@ export const PromptForm: React.FC<PromptFormProps> = ({
                                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                                     className="absolute bottom-full mb-2 left-0 w-64 bg-slate-800 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-20 backdrop-blur-xl"
                                                 >
-                                                    <div className="max-h-60 overflow-y-auto py-1">
+                                                    <div className="max-h-60 overflow-y-auto">
                                                         {PLATFORM_CATEGORIES.map((category) => (
                                                             <div key={category.name}>
-                                                                <div className="px-4 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10 border-b border-white/5">
+                                                                <div className="px-4 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-950 sticky top-0 z-10 border-b border-white/5 shadow-sm">
                                                                     <div className="flex items-center gap-2">
                                                                         <category.icon className="h-3 w-3" />
                                                                         {category.name}
                                                                     </div>
                                                                 </div>
-                                                                <div className="py-1">
+                                                                <div className="py-0.5 space-y-0.5">
                                                                     {category.options.map((platform) => (
                                                                         <button
                                                                             key={platform.value}
@@ -284,7 +284,7 @@ export const PromptForm: React.FC<PromptFormProps> = ({
                                                                                 setIsPlatformOpen(false);
                                                                             }}
                                                                             className={cn(
-                                                                                "w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold transition-all text-left pl-8", // Increased padding-left for indentation
+                                                                                "w-full flex items-center gap-3 px-4 py-2 text-sm font-bold transition-all text-left pl-8", // Adjusted padding
                                                                                 targetPlatform === platform.value
                                                                                     ? "bg-indigo-500/10 text-indigo-400"
                                                                                     : "text-slate-400 hover:bg-white/5 hover:text-white"
