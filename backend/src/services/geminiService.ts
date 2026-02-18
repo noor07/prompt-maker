@@ -25,8 +25,8 @@ if (!API_KEY) {
 }
 
 const genAI = new GoogleGenerativeAI(API_KEY || "dummy_key");
-// User requested "gemini 2.5 flash lite", mapping to stable "gemini-1.5-flash"
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+// User requested "gemini 2.5 flash lite", using verified "gemini-2.0-flash-lite"
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
 export class GeminiService {
     async generatePrompt(data: { keywords: string, taskType: string, platform?: string }): Promise<string> {
