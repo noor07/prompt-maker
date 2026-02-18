@@ -108,6 +108,16 @@ app.get('/', (req: Request, res: Response) => {
     res.json({ message: 'Welcome to Prompt Maker Backend!' });
 });
 
+app.get('/debug-config', (req: Request, res: Response) => {
+    res.json({
+        geminiKey: process.env.GEMINI_API_KEY ? 'Present' : 'Missing',
+        geminiKeyPrefix: process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.substring(0, 4) + '...' : 'N/A',
+        firebaseServiceAccount: process.env.FIREBASE_SERVICE_ACCOUNT ? 'Present' : 'Missing',
+        firebaseRawLength: process.env.FIREBASE_SERVICE_ACCOUNT ? process.env.FIREBASE_SERVICE_ACCOUNT.length : 0,
+        isBase64: process.env.FIREBASE_SERVICE_ACCOUNT ? !process.env.FIREBASE_SERVICE_ACCOUNT.trim().startsWith('{') : false
+    });
+});
+
 app.post('/generate', async (req: Request, res: Response) => {
     try {
         let bodyData = req.body;
