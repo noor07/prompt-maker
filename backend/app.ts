@@ -12,6 +12,8 @@ const envPath = path.resolve(__dirname, '../.env');
 dotenv.config({ path: envPath });
 
 const app = express();
+console.log("GEMINI_API_KEY set:", Boolean(process.env.GEMINI_API_KEY));
+console.log("FIREBASE_SERVICE_ACCOUNT_B64 set:", Boolean(process.env.FIREBASE_SERVICE_ACCOUNT_B64));
 const geminiService = new GeminiService();
 
 // Initialize Firebase Admin SDK
