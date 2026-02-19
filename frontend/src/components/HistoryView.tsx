@@ -14,12 +14,16 @@ import {
 } from 'lucide-react';
 interface HistoryItem {
     id: string;
-    title: string;
-    prompt: string;
-    platform: string;
-    type: string;
-    model: string;
-    tone: string;
+    title?: string;
+    keywords?: string; // Backend uses keywords
+    prompt?: string;   // Legacy fallback
+    targetPlatform?: string; // Backend uses targetPlatform
+    platform?: string; // Legacy fallback
+    taskType?: string; // Backend uses taskType
+    type?: string;     // Legacy fallback
+    model?: string;
+    tone?: string;
+    generatedPrompt?: string;
 }
 
 interface HistoryViewProps {

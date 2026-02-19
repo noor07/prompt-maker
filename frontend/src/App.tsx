@@ -89,7 +89,7 @@ function PromptGenerator() {
       await api.post('/save-prompt', {
         keywords,
         taskType,
-        targetPlatform: 'Generic', // Simplified
+        targetPlatform, // Fixed: use state variable
         tone: 'Professional', // Simplified
         model: GEMINI_MODEL,
         generatedPrompt
@@ -103,8 +103,9 @@ function PromptGenerator() {
   };
 
   const handleLoadLibraryItem = (item: any) => {
-    setKeywords(item.prompt);
-    setTaskType(item.type || 'writing');
+    setKeywords(item.keywords || item.prompt || '');
+    setTaskType(item.taskType || item.type || 'writing');
+    setTargetPlatform(item.targetPlatform || item.platform || 'ChatGPT');
     setGeneratedPrompt('');
     setActiveNav('new');
   };
