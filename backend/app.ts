@@ -156,6 +156,7 @@ app.get('/debug-config', (req: Request, res: Response) => {
         geminiKey: process.env.GEMINI_API_KEY ? 'Present' : 'Missing',
         geminiKeyPrefix: process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.substring(0, 4) + '...' : 'N/A',
         firebaseServiceAccount: process.env.FIREBASE_SERVICE_ACCOUNT ? 'Present' : 'Missing',
+        firebaseServiceAccountB64: process.env.FIREBASE_SERVICE_ACCOUNT_B64 ? 'Present' : 'Missing', // Added this check
         firebaseRawLength: process.env.FIREBASE_SERVICE_ACCOUNT ? process.env.FIREBASE_SERVICE_ACCOUNT.length : 0,
         isBase64: process.env.FIREBASE_SERVICE_ACCOUNT ? !process.env.FIREBASE_SERVICE_ACCOUNT.trim().startsWith('{') : false
     });
