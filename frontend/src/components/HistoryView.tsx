@@ -8,7 +8,9 @@ import {
     Terminal,
     Sparkles,
     Check,
-    History as HistoryIconLucide
+    History as HistoryIconLucide,
+    Maximize2,
+    X
 } from 'lucide-react';
 interface HistoryItem {
     id: string;
@@ -29,7 +31,9 @@ interface HistoryViewProps {
 // MOCK_HISTORY removed in favor of real data passed via props
 
 
+
 export const HistoryView: React.FC<HistoryViewProps> = ({ prompts, onLoadToEditor, onDelete }) => {
+    const [expandedItem, setExpandedItem] = React.useState<any | null>(null);
     const [copiedId, setCopiedId] = React.useState<string | null>(null);
 
     const handleCopy = async (id: string, text: string) => {
@@ -101,21 +105,14 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ prompts, onLoadToEdito
                             {/* Card Footer: Actions */}
                             <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/5">
                                 <button
-                                    onClick={() => onLoadToEditor(item)}
+                                    onClick={() => setExpandedItem(item)}
                                     className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-600/10 text-indigo-400 text-xs font-bold hover:bg-indigo-600 hover:text-white transition-all"
                                 >
-                                    <Play className="h-3 w-3 fill-current" />
-                                    Load to Editor
+                                    <Maximize2 className="h-3 w-3" />
+                                    Expand
                                 </button>
 
                                 <div className="flex items-center gap-1.5">
-                                    <button
-                                        onClick={() => handleCopy(item.id, item.generatedPrompt || item.prompt)}
-                                        className="p-2 rounded-lg text-slate-500 hover:text-white hover:bg-white/5 transition-all"
-                                        title="Copy Prompt"
-                                    >
-                                        {copiedId === item.id ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
-                                    </button>
                                     <button
                                         onClick={() => onDelete(item.id)}
                                         className="p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/5 transition-all"
@@ -129,6 +126,78 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ prompts, onLoadToEdito
                     ))
                 )}
             </div>
+
+            {/* Expanded Modal */}
+            {expandedItem && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+                    <div
+                        className="w-full max-w-3xl bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+                    >
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between p-6 border-b border-white/5 bg-slate-900">
+                            <div>
+                                <h3 className="text-xl font-bold text-white mb-1">
+                                    {expandedItem.keywords || expandedItem.title || "Untitled Prompt"}
+                                </h3>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold uppercase tracking-wider">
+                                        {expandedItem.platform || expandedItem.targetPlatform || 'Generic'}
+                                    </span>
+                                    <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+                                        {(expandedItem.model || 'GEMINI').toUpperCase()}
+                                    </span>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setExpandedItem(null)}
+                                className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+                            >
+                                <X className="h-6 w-6" />
+                            </button>
+                        </div>
+
+                        {/* Modal Body (Scrollable) */}
+                        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                            {/* User Input Section */}
+                            <div className="space-y-2">
+                                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Input Keywords</h4>
+                                <div className="p-4 rounded-xl bg-slate-950/50 border border-white/5 text-slate-300 text-sm">
+                                    {expandedItem.keywords || "No input keywords recorded."}
+                                </div>
+                            </div>
+
+                            {/* Generated Prompt Section */}
+                            <div className="space-y-2">
+                                <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Generated Prompt</h4>
+                                <div className="p-4 rounded-xl bg-slate-950 border border-indigo-500/20 text-slate-200 text-sm font-mono whitespace-pre-wrap leading-relaxed">
+                                    {expandedItem.generatedPrompt || expandedItem.prompt}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="p-6 border-t border-white/5 bg-slate-900 flex justify-end gap-3">
+                            <button
+                                onClick={() => handleCopy(expandedItem.id, expandedItem.generatedPrompt || expandedItem.prompt)}
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm font-bold hover:bg-slate-700 hover:text-white transition-all"
+                            >
+                                {copiedId === expandedItem.id ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
+                                Copy Prompt
+                            </button>
+                            <button
+                                onClick={() => {
+                                    onLoadToEditor(expandedItem);
+                                    setExpandedItem(null);
+                                }}
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 shadow-lg shadow-indigo-500/20 transition-all"
+                            >
+                                <Play className="h-4 w-4 fill-current" />
+                                Load to Editor
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

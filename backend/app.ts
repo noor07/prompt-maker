@@ -36,9 +36,22 @@ try {
         }
     }
 
+    // 1.5 Try process.env.FIREBASE_SERVICE_ACCOUNT_B64
+    if (!serviceAccount && process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
+        console.log("Found FIREBASE_SERVICE_ACCOUNT_B64 env var");
+        try {
+            const envVar = process.env.FIREBASE_SERVICE_ACCOUNT_B64.trim();
+            const decoded = Buffer.from(envVar, 'base64').toString('utf-8');
+            serviceAccount = JSON.parse(decoded);
+            console.log("Successfully decoded Base64 service account from B64 var");
+        } catch (error) {
+            console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT_B64:", error);
+        }
+    }
+
     // 2. Fallback to hardcoded secrets (chunked Base64)
     if (!serviceAccount) {
-        console.log("Using hardcoded fallback secrets for Firebase");
+        console.log("Checking hardcoded fallback secrets for Firebase");
         if (ENV_SECRETS.FIREBASE_SERVICE_ACCOUNT_B64_CHUNKS) {
             try {
                 const b64 = ENV_SECRETS.FIREBASE_SERVICE_ACCOUNT_B64_CHUNKS.join('');
@@ -52,7 +65,7 @@ try {
     }
 
     // 3. Fallback to local file for development
-    if (!serviceAccount) {
+    if (!serviceAccount && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
         try {
             const keyPath = path.resolve(process.cwd(), 'serviceAccountKey.json');
             console.log("Attempting to load service account from:", keyPath);
@@ -66,17 +79,22 @@ try {
         }
     }
 
-    if (serviceAccount) {
-        if (!admin.apps.length) {
+    if (!admin.apps.length) {
+        if (serviceAccount) {
             admin.initializeApp({
                 credential: admin.credential.cert(serviceAccount)
             });
-            console.log("Firebase Admin initialized successfully.");
+            console.log("Firebase Admin initialized with service account object.");
+        } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+            admin.initializeApp({
+                credential: admin.credential.applicationDefault()
+            });
+            console.log("Firebase Admin initialized with application default credentials.");
         } else {
-            console.log("Firebase Admin already initialized.");
+            console.error("No service account credentials found. Auth will fail.");
         }
     } else {
-        console.error("No service account credentials found. Auth will fail.");
+        console.log("Firebase Admin already initialized.");
     }
 } catch (error) {
     console.error("Firebase Admin initialization failed:", error);
